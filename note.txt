@@ -1,0 +1,20 @@
+
+
+---
+request to get products that you own:
+// TODO
+
+
+----
+request to send a message [conversation.id, user.id (JWT), text]
+user.id in [conversation.buyer, conversation.product.seller]
+[notify]
+
+Message:
+conversation: Conversation.id
+sender: user.id
+created_at: DateTime
+content: String
+
+---
+request to get messages of a product 

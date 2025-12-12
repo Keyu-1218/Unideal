@@ -1,0 +1,64 @@
+/* Вибраний день */
+
+.react-datepicker-wrapper {
+  display: block !important;
+}
+
+
+.react-datepicker__input-container {
+  width: 100%; /* або 100% */
+}
+
+.react-datepicker__input-container input {
+  width: 100% !important; /* або конкретний px, як потрібно */
+  display: block;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--selected:focus {
+  background-color: var(--color-green-dark) !important;
+  color: black !important;
+  border-radius: 9999px;
+}
+
+/* Дні в середині вибраного діапазону */
+.react-datepicker__day--in-range,
+.react-datepicker__day--in-range:hover,
+.react-datepicker__day--in-range:focus {
+  background-color: var(--color-green-light) !important;
+  color: black !important;
+}
+
+/* Початок діапазону */
+.react-datepicker__day--range-start {
+  background-color: var(--color-green-dark) !important;
+  color: black !important;
+  border-radius: 9999px;
+}
+
+/* Кінець діапазону */
+.react-datepicker__day--range-end {
+  background-color: var(--color-green-dark) !important;
+  color: black !important;
+  border-radius: 9999px;
+}
+
+/* Сьогоднішній день */
+.react-datepicker__day--today {
+  border: 1px solid var(--color-green-dark) !important;
+}
+
+/* Hover для всіх днів */
+.react-datepicker__day:hover,
+.react-datepicker__day:focus {
+  background-color: var(--color-green-light) !important;
+  color: #fff !important;
+}
+
+/* Вибраний день при hover */
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--selected:focus {
+  background-color: var(--color-green-dark) !important;
+  color: #fff !important;
+}

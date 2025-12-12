@@ -1,0 +1,80 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    environment:
+      - VITE_BASE_DEV_URL=http://localhost:5001
+
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - /app/uploads
+    env_file:
+      - .env
+    environment:
+      PORT: 5000
+      HOST: 0.0.0.0
+      NODE_ENV: development
+
+      # Example: pass a full connection string to your app
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      # or individual vars if your code reads them separately:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+      db-migrations:
+        condition: service_completed_successfully
+
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432" # optional: expose to host
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Optional: auto-run SQL on first init (see step 4)
+      # - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  db-migrations:
+    image: flyway/flyway:10
+    env_file:
+      - .env
+    environment:
+      - FLYWAY_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - FLYWAY_USER=${POSTGRES_USER}
+      - FLYWAY_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/db-migrations:/flyway/sql
+    command:  -connectRetries=60 -baselineOnMigrate=true migrate
+
+volumes:
+  pgdata:
