@@ -18,9 +18,9 @@ export function ProductCarousel({ photos }: { photos: string[] }) {
   }
 
   return (
-    <div className="relative w-[618px] h-[618px] bg-background-light flex items-center justify-center overflow-hidden">
+    <div className="relative w-[618px] h-[675px] rounded-lg bg-background-light flex items-center justify-center overflow-hidden">
       <Carousel className="w-full h-full">
-        <CarouselContent className="h-full">
+        <CarouselContent className="h-full ">
           {photos.map((photo, index) => (
             <CarouselItem
               key={photo}
@@ -31,7 +31,7 @@ export function ProductCarousel({ photos }: { photos: string[] }) {
                   <img
                     src={`${PHOTO_DOWNLOAD_URL}/${photo}`}
                     alt={`Product image ${index}`}
-                    className="w-[464px] h-[618px] object-contain"
+                    className="w-[464px] h-[618px] object-contain rounded-lg"
                   />
                 </CardContent>
               </Card>

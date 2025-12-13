@@ -111,39 +111,41 @@ const ProductShortDescription = () => {
         <div className="border-b border-[#B9CFBF] mb-6" />
 
         {/* Product Carousel */}
-        <div className="rounded-md overflow-hidden bg-white shadow-sm mb-5 relative w-2/3 mx-auto">
-          <Carousel className="w-full aspect-[5/4]">
-            <CarouselContent className="h-full">
-              {photos.length > 0 ? (
-                photos.map((photo) => (
-                  <CarouselItem key={photo} className="h-full w-full">
-                    <img
-                      src={
-                        photo.startsWith("http")
-                          ? photo
-                          : `${PHOTO_DOWNLOAD_URL}/${photo}`
-                      }
-                      alt={product.title}
-                      className="object-cover w-full h-full"
-                    />
+        <div className="mb-5 relative w-2/3 mx-auto">
+          <Carousel className="w-full">
+            <div className="w-full aspect-[4/5] rounded-md overflow-hidden bg-white shadow-sm relative">
+              <CarouselContent className="h-full">
+                {photos.length > 0 ? (
+                  photos.map((photo) => (
+                    <CarouselItem key={photo} className="h-full w-full">
+                      <img
+                        src={
+                          photo.startsWith("http")
+                            ? photo
+                            : `${PHOTO_DOWNLOAD_URL}/${photo}`
+                        }
+                        alt={product.title}
+                        className="object-cover w-full h-full"
+                      />
+                    </CarouselItem>
+                  ))
+                ) : (
+                  <CarouselItem className="h-full w-full flex items-center justify-center bg-gray-200">
+                    <p className="text-gray-400">No photos</p>
                   </CarouselItem>
-                ))
-              ) : (
-                <CarouselItem className="h-full w-full flex items-center justify-center bg-gray-200">
-                  <p className="text-gray-400">No photos</p>
-                </CarouselItem>
-              )}
-            </CarouselContent>
+                )}
+              </CarouselContent>
+              <span className="absolute bottom-4 left-4 bg-gray-light px-3 py-1 rounded-full text-green-dark font-semibold text-sm shadow">
+                €{product.price}
+              </span>
+            </div>
             {photos.length > 1 && (
               <>
-                <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 bg-green-dark text-white hover:bg-green-dark hover:opacity-80" />
-                <CarouselNext className="right-2 top-1/2 -translate-y-1/2 bg-green-dark text-white hover:bg-green-dark hover:opacity-80" />
+                <CarouselPrevious className="-left-12 top-1/2 -translate-y-1/2 bg-green-dark text-white hover:bg-green-dark hover:opacity-80 border-none" />
+                <CarouselNext className="-right-12 top-1/2 -translate-y-1/2 bg-green-dark text-white hover:bg-green-dark hover:opacity-80 border-none" />
               </>
             )}
           </Carousel>
-          <span className="absolute bottom-4 left-4 bg-gray-light px-3 py-1 rounded-full text-green-dark font-semibold text-sm shadow">
-            €{product.price}
-          </span>
         </div>
 
         {/* Product Info */}

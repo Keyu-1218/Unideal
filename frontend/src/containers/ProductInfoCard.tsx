@@ -112,7 +112,7 @@ const ProductInfoCard = ({ product }: { product: Product }) => {
         </div>
         <Button
           disabled={isLoading || isSendingInitialMessage || isOwnProduct}
-          className="w-full text-2xl font-bold bg-green-dark hover:bg-green-dark hover:opacity-90 py-6 mt-8 hover:cursor-pointer"
+          className="w-full text-xl font-normal bg-green-dark hover:bg-green-dark hover:opacity-90 py-6 mt-8 hover:cursor-pointer"
           onClick={handleDibsClick}
         >
           {isOwnProduct

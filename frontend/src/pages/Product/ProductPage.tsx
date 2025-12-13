@@ -31,8 +31,8 @@ export const ProductPage = () => {
 
   return (
     <Container>
-      <main className="mt-16">
-        <div className="flex justify-between ">
+      <main className="mt-16 px-8">
+        <div className="flex justify-between gap-16">
           <div className="max-w-[618px]">
             <ProductCarousel photos={photos} />
           </div>

@@ -122,7 +122,7 @@ const DatesStep = () => {
                 startDateError ? "border-red-500" : "border-gray-200"
               }`}
             >
-              <p className="text-sm text-text-gray mb-1">Pick up date</p>
+              <p className="text-sm text-text-gray mb-1">Pick up date stars on</p>
               <p
                 className={`text-lg font-bold ${
                   startDateError ? "text-red-500" : "text-green-dark"
@@ -138,7 +138,7 @@ const DatesStep = () => {
                 endDateError ? "border-red-500" : "border-gray-200"
               }`}
             >
-              <p className="text-sm text-text-gray mb-1">Return date</p>
+              <p className="text-sm text-text-gray mb-1">Pick up date ends on</p>
               <p
                 className={`text-lg font-bold ${
                   endDateError ? "text-red-500" : "text-green-dark"
