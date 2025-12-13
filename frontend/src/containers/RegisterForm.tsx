@@ -56,7 +56,7 @@ const RegisterForm = () => {
 
   return (
     <form
-      className="flex flex-col gap-6 max-w-sm mx-auto p-6"
+      className="flex flex-col gap-3 max-w-sm mx-auto p-6"
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="min-h-[26px] flex items-center">
@@ -68,13 +68,13 @@ const RegisterForm = () => {
       </div>
 
       {/* Email field */}
-      <div className="w-full">
-        <Label htmlFor="email">Email</Label>
+      <div className="w-full flex flex-col gap-1.5">
+        <Label htmlFor="email">Email</Label> 
         <Input
           type="email"
           id="email"
-          placeholder="Email"
-          className={errors.email ? "border-red-500 mt-2" : "mt-2"}
+          placeholder="name@example.com"
+          className={errors.email ? "border-red-500" : ""}
           {...register("email")}
         />
         {/* Fixed height for error message */}
@@ -88,13 +88,13 @@ const RegisterForm = () => {
       </div>
 
       {/* Password field */}
-      <div className="w-full">
+      <div className="w-full flex flex-col gap-1.5">
         <Label htmlFor="password">Password</Label>
         <Input
           type="password"
           id="password"
-          placeholder="Password"
-          className={errors.password ? "border-red-500 mt-2" : "mt-2"}
+          placeholder="at least 8 characters"
+          className={errors.password ? "border-red-500" : ""}
           {...register("password")}
         />
         {/* Fixed height for error message */}

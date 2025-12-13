@@ -54,7 +54,7 @@ const LoginForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-6 max-w-sm mx-auto p-6"
+      className="flex flex-col gap-3 max-w-sm mx-auto p-6"
     >
       {/* Auth error container - fixed height */}
       <div className="min-h-[26px] flex items-center">
