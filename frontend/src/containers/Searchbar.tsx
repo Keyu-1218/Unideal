@@ -15,7 +15,7 @@ const Searchbar = ({
   searchQuery,
   onSearchChange,
 }: SearchbarProps) => {
-  const styles = size === "medium" ? "w-[344px] h-16" : "w-[218px] h-14";
+  const styles = size === "medium" ? "w-full h-16" : "w-[218px] h-14";
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSearchChange(e.target.value);

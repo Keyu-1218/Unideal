@@ -16,30 +16,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
   if (!product) return <p>Error loading product</p>;
 
   return (
-    <div className="w-[224px] rounded-lg bg-white box-border shadow transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
+    <div className="w-full box-border transition-transform duration-300 ease-in-out hover:scale-105">
       <Link to={`/product/${product.id}`}>
-        <div className="overflow-hidden rounded-md w-full h-[281px] relative">
+        <div className="overflow-hidden rounded-lg w-full aspect-[4/5] relative">
           <img
             src={imageUrl}
             alt={`${product.title} image`}
             loading="lazy"
-            className="w-full h-full object-contain object-center"
+            className="w-full h-full object-cover object-center"
           />
 
-          <div className="absolute z-10 top-0.5 left-0.5 rounded-sm p-1 text-[14px] font-bold text-white bg-green-light">
-            Pick up from {product.pickup.date.available_from}
-          </div>
           <div className="absolute bottom-5 left-3 text-green-dark bg-gray-light p-1 px-2.5 rounded-2xl font-semibold">
             €{product.price}
           </div>
         </div>
 
-        <div className="p-3 flex flex-col gap-1">
+        <div className="mt-2 flex flex-col gap-0.5">
           {" "}
-          <span className="text-sm font-semibold mb-1 text-[20px]">
+          <span className="font-semibold text-base">
             {product.title}
           </span>
-          <span className="text-xs text-gray-500 text-[16px]">
+          <span className="text-xs text-gray-500">
             {product.pickup.address.city}
           </span>
         </div>
