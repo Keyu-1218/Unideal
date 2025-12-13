@@ -35,7 +35,7 @@ const RightProfileSideBar = ({
           onSearchChange={onSearchChange}
         />
 
-        <div className="w-[218px] h-[143px] bg-background-light rounded-lg">
+        <div className="w-[218px] h-[143px] bg-background-light rounded-xs">
           <div className="flex flex-col items-start justify-center min-h-[143px] gap-4 px-4">
             {/* Ongoing */}
             <div className="flex gap-2.5 items-center">

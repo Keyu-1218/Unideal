@@ -67,7 +67,7 @@ const ChatWindow = () => {
           <MessageList messages={displayMessages} />
         )}
       </div>
-      <div className="flex-none bg-white border-t">
+      <div className="flex-none bg-white pb-4 px-4">
         <MessageInput conversationId={Number(conversationId)} />
       </div>
     </div>

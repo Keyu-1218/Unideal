@@ -22,7 +22,7 @@ const ProfileProductCard = ({ product }: { product: Product }) => {
             €{product.price}
           </div>
         </div>
-        <p className="text-center font-bold text-[16px] mt-2.5">{product.title}</p>
+        <p className="text-left font-bold text-[14px] mt-2.5">{product.title}</p>
       </Link>
     </div>
   );

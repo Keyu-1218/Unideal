@@ -98,23 +98,25 @@ const ProductShortDescription = () => {
     <aside className="w-[375px] h-dvh border-l bg-[#F3F6F2] flex flex-col">
       <div className="flex-1 overflow-y-auto px-5 py-6">
         {/* Seller/Buyer Info */}
-        <div className="flex items-center gap-4 mb-6">
-          <UserAvatar label={otherPersonName} size="md" />
+        <div className="flex items-center justify-between mb-4 w-7/8 mx-auto">
           <div>
             <p className="font-bold text-[16px] text-green-dark">
               {otherPersonName}
             </p>
             <div className="text-xs text-[#5E836C] font-semibold">⭐ 4.8</div>
           </div>
+          <UserAvatar label={otherPersonName} size="md" />
         </div>
 
+        <div className="border-b border-[#B9CFBF] mb-6" />
+
         {/* Product Carousel */}
-        <div className="rounded-2xl overflow-hidden bg-white shadow-sm mb-5 relative">
-          <Carousel className="w-full h-[220px]">
+        <div className="rounded-md overflow-hidden bg-white shadow-sm mb-5 relative w-2/3 mx-auto">
+          <Carousel className="w-full aspect-[5/4]">
             <CarouselContent className="h-full">
               {photos.length > 0 ? (
                 photos.map((photo) => (
-                  <CarouselItem key={photo} className="h-[220px]">
+                  <CarouselItem key={photo} className="h-full w-full">
                     <img
                       src={
                         photo.startsWith("http")
@@ -127,7 +129,7 @@ const ProductShortDescription = () => {
                   </CarouselItem>
                 ))
               ) : (
-                <CarouselItem className="h-[220px] flex items-center justify-center bg-gray-200">
+                <CarouselItem className="h-full w-full flex items-center justify-center bg-gray-200">
                   <p className="text-gray-400">No photos</p>
                 </CarouselItem>
               )}
@@ -139,19 +141,16 @@ const ProductShortDescription = () => {
               </>
             )}
           </Carousel>
-          <span className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-green-dark font-semibold text-sm shadow">
+          <span className="absolute bottom-4 left-4 bg-gray-light px-3 py-1 rounded-full text-green-dark font-semibold text-sm shadow">
             €{product.price}
           </span>
         </div>
 
         {/* Product Info */}
-        <div className="mb-6">
-          <h3 className="text-2xl font-bold text-green-dark">
+        <div className="mb-6 w-7/8 mx-auto">
+          <h3 className="text-xl font-bold text-green-dark">
             {product.title}
           </h3>
-          <p className="text-sm text-[#4A5B4F] leading-6 mt-2">
-            {product.short_description}
-          </p>
         </div>
 
         {/* TODO List */}
@@ -170,23 +169,27 @@ const ProductShortDescription = () => {
               </p>
             </div>
             <Icon
-              name="arrowUp"
+              name="toggle"
               size={18}
-              className={`transition-transform ${
-                isTodoOpen ? "" : "rotate-180"
-              }`}
+              className={isTodoOpen ? "" : "rotate-180"}
             />
           </button>
-          {isTodoOpen && (
-            <ul className="px-5 pb-5 space-y-3">
-              {tasks.map((label) => (
-                <li key={label} className="flex items-center gap-3">
-                  <Icon name="clock" size={18} />
-                  <span className="text-sm text-black font-bold">{label}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <div
+            className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+              isTodoOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <ul className="px-5 pb-5 space-y-3">
+                {tasks.map((label) => (
+                  <li key={label} className="flex items-center gap-3">
+                    <Icon name="clock" size={18} />
+                    <span className="text-sm text-black font-bold">{label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
         {/* Pickup Location & Time */}
@@ -203,23 +206,27 @@ const ProductShortDescription = () => {
               <Icon
                 name="toggle"
                 size={18}
-                className={`transition-transform ${
-                  isLocationOpen ? "" : "rotate-180"
-                }`}
+                className={isLocationOpen ? "" : "rotate-180"}
               />
             </button>
-            {isLocationOpen && (
-              <div className="mt-4">
-                <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-sm cursor-pointer">
-                  <Icon
-                    name="whiteLocation"
-                    size={12}
-                    className="cursor-default"
-                  />
-                  <p className="text-white">{scheduleLabel}</p>
-                </button>
+            <div
+              className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+                isLocationOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="mt-4">
+                  <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-sm cursor-pointer">
+                    <Icon
+                      name="whiteLocation"
+                      size={12}
+                      className="cursor-default"
+                    />
+                    <p className="text-white">{scheduleLabel}</p>
+                  </button>
+                </div>
               </div>
-            )}
+            </div>
           </div>
 
           <div className="bg-[#E9F1EB] rounded-2xl px-5 py-4 border border-[#B9CFBF]">
@@ -234,23 +241,27 @@ const ProductShortDescription = () => {
               <Icon
                 name="toggle"
                 size={18}
-                className={`transition-transform ${
-                  isTimeOpen ? "" : "rotate-180"
-                }`}
+                className={isTimeOpen ? "" : "rotate-180"}
               />
             </button>
-            {isTimeOpen && (
-              <div className="mt-4">
-                <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-sm cursor-pointer">
-                  <Icon
-                    name="whiteCalendar"
-                    size={18}
-                    className="cursor-default"
-                  />
-                  <p className="text-white">{scheduleLabel}</p>
-                </button>
+            <div
+              className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+                isTimeOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="mt-4">
+                  <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-sm cursor-pointer">
+                    <Icon
+                      name="whiteCalendar"
+                      size={18}
+                      className="cursor-default"
+                    />
+                    <p className="text-white">{scheduleLabel}</p>
+                  </button>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 

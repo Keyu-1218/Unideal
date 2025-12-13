@@ -46,9 +46,9 @@ const MessageInput = ({ conversationId }: { conversationId: number }) => {
         <button
           onClick={handleSendMessage}
           disabled={isSendingMessage}
-          className="bg-background-gray-200 rounded-full p-2 absolute right-1.5 top-1/2 -translate-y-1/2 hover:opacity-90"
+          className="bg-background-gray-200 rounded-full p-1.5 absolute right-1.5 top-1/2 -translate-y-1/2 hover:opacity-90"
         >
-          <Icon name="arrowUp" size={20} />
+          <Icon name="arrowUp" size={18} />
         </button>
       </div>
     </div>
