@@ -10,29 +10,32 @@ const LeftProfileSideBar = ({ userEmail }: { userEmail: string }) => {
   const isPurchasedPage = location.pathname === "/profile/purchased";
 
   return (
-    <aside className="flex flex-col gap-9 h-screen border-r-1 border-gray-light p-12">
+    <aside
+      className="flex flex-col gap-9 h-screen border-r-1 border-gray-light py-6 pr-6"
+      style={{ paddingLeft: "max(2rem, calc((100vw - 1400px) / 2))" }}
+    >
       <div className="flex gap-4 items-center">
         <UserAvatar label={userEmail} size="md"/>
         <span className="font-bold text-3xl">{name}</span>
       </div>
       <div>
         <div
-          className={`w-[229px] h-[46px] text-[14px] flex items-center gap-6 py-4 px-6  rounded-[10px] ${
+          className={`w-[240px] h-[46px] text-[14px] flex items-center gap-4 py-4 px-4  rounded-[10px] ${
             isSellingPage ? `bg-background-light` : ""
           }`}
         >
           <Icon name="sell" size={23} />
-          <Link to="/profile/sold-and-selling" className="font-bold">
+          <Link to="/profile/sold-and-selling" className="font-bold whitespace-nowrap">
             Selling & Sold Items
           </Link>
         </div>
         <div
-          className={`w-[229px] h-[46px] text-[14px] flex items-center gap-6 py-4 px-6  rounded-[10px] ${
+          className={`w-[240px] h-[46px] text-[14px] flex items-center gap-4 py-4 px-4  rounded-[10px] ${
             isPurchasedPage ? `bg-background-light` : ""
           }`}
         >
           <Icon name="purchase" size={23} />
-          <Link to="/profile/purchased" className="font-bold">
+          <Link to="/profile/purchased" className="font-bold whitespace-nowrap">
             Purchased items
           </Link>
         </div>

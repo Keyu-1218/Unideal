@@ -34,22 +34,14 @@ const SoldProfileSection = () => {
 
   return (
     <div className="flex-1">
-      <main className="grid grid-cols-4 p-11 gap-x-11 gap-y-16">
+      <main className="flex flex-wrap p-11 gap-x-7 gap-y-8 max-w-[940px] min-w-[492px]">
         {/* Add new product card */}
         <AddProductCard />
 
         {/* Filtered product cards */}
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <ProfileProductCard key={product.id} product={product} />
-          ))
-        ) : (
-          <div className="col-span-3 flex items-center justify-center h-64">
-            <p className="text-gray-400">
-              {searchQuery ? "No products found" : "No products yet"}
-            </p>
-          </div>
-        )}
+        {filteredProducts.map((product) => (
+          <ProfileProductCard key={product.id} product={product} />
+        ))}
       </main>
     </div>
   );

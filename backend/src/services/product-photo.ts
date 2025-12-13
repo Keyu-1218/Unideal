@@ -15,25 +15,30 @@ type PhotoInput = z.infer<typeof PhotoSchema>;
 const productPhotoRepository = new ProductPhotoRepository();
 
 // Set up multer for handling file uploads
-const upload = multer({ dest: process.env.UPLOAD_DIR }); // Files will be saved to 'uploads/' directory
+const upload = multer({ dest: process.env.UPLOAD_DIR || "uploads/" }); // Files will be saved to 'uploads/' directory
 
 // TODO check the user. the owner only can add photos
 export default class ProductPhotoService {
     addAnArrayForProduct: Handler[] = [upload.array("files"), validateBody(PhotoSchema), async (req, res) => {
-        const input = (req as any).validated as PhotoInput;
+        try {
+            const input = (req as any).validated as PhotoInput;
 
-        const files = req.files as Express.Multer.File[] | undefined;
+            const files = req.files as Express.Multer.File[] | undefined;
 
-        if (!files || (Array.isArray(files) && files.length === 0)) {
-            return res.status(400).json({ error: "No Files Uploaded" });
+            if (!files || (Array.isArray(files) && files.length === 0)) {
+                return res.status(400).json({ error: "No Files Uploaded" });
+            }
+
+            for (const file of files) {
+                await productPhotoRepository.create({ product_id: input.product_id, photo_url: file.filename });
+                // console.log(`Uploaded file: ${file.originalname} to ${file.path}`);
+            }
+
+            res.status(201).json({ message: "Files uploaded successfully" });
+        } catch (error) {
+            console.error("Error in addAnArrayForProduct:", error);
+            res.status(500).json({ error: "Internal Server Error", details: error });
         }
-
-        for (const file of files) {
-            await productPhotoRepository.create({ product_id: input.product_id, photo_url: file.filename });
-            // console.log(`Uploaded file: ${file.originalname} to ${file.path}`);
-        }
-
-        res.status(201).json({ message: "Files uploaded successfully" });
     }];
 
     getPhotosByProductId: Handler = async (req, res) => {
@@ -47,9 +52,13 @@ export default class ProductPhotoService {
     };
 
     downloadPhoto: Handler = (req, res) => {
-        const filePath = path.join("uploads", req.params.filename);
-        res.download(filePath, err => {
-            if (err) res.status(404).send("File not found");
+        const uploadDir = process.env.UPLOAD_DIR || "uploads";
+        const filePath = path.resolve(uploadDir, req.params.filename);
+        res.sendFile(filePath, err => {
+            if (err) {
+                console.error("Error sending file:", err);
+                res.status(404).send("File not found");
+            }
         });
     };
 };

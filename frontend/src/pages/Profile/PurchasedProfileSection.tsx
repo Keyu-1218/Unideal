@@ -1,10 +1,8 @@
 const PurchasedProfileSection = () => {
   return (
-    <div className="flex-1">
-      <main className="flex justify-center items-center">
-        <div className="flex items-center justify-center h-full">
-          <p className="text-gray-400">No products yet</p>
-        </div>
+    <div className="flex-1 flex flex-col">
+      <main className="flex-1 flex justify-center items-center">
+        <p className="text-gray-400">No products yet</p>
       </main>
     </div>
   );

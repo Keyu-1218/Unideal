@@ -18,7 +18,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-      - /app/uploads
+      - backend_uploads:/app/uploads
     env_file:
       - .env
     environment:
@@ -78,3 +78,4 @@ services:
 
 volumes:
   pgdata:
+  backend_uploads:
