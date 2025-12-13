@@ -23,7 +23,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             src={imageUrl}
             alt={`${product.title} image`}
             loading="lazy"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-contain object-center"
           />
 
           <div className="absolute z-10 top-0.5 left-0.5 rounded-sm p-1 text-[14px] font-bold text-white bg-green-light">
