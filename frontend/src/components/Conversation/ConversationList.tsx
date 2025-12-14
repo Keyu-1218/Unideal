@@ -21,7 +21,7 @@ const ConversationList = () => {
 
   if (isLoading) {
     return (
-      <aside className="w-[332px] h-dvh border-r flex items-center justify-center">
+      <aside className="w-[280px] h-dvh border-r flex items-center justify-center">
         <Spinner />
       </aside>
     );
@@ -29,7 +29,7 @@ const ConversationList = () => {
 
   if (error) {
     return (
-      <aside className="w-[332px] h-dvh border-r">
+      <aside className="w-[280px] h-dvh border-r">
         <div className="font-bold text-[20px] m-[25px]">Messages</div>
         <div className="flex items-center justify-center h-[calc(100%-80px)]">
           <p className="text-red-500 text-sm px-4 text-center">
@@ -42,7 +42,7 @@ const ConversationList = () => {
 
   if (!conversations || conversations.length === 0) {
     return (
-      <aside className="w-[332px] h-dvh border-r">
+      <aside className="w-[280px] h-dvh border-r">
         <div className="font-bold text-[20px] m-[25px]">Messages</div>
         <div className="flex flex-col items-center justify-center h-[calc(100%-80px)] px-6">
           <div className="mb-4">
@@ -72,7 +72,7 @@ const ConversationList = () => {
   }
 
   return (
-    <aside className="w-[332px] h-dvh border-r">
+    <aside className="w-[280px] h-dvh border-r">
       <div className="font-bold text-[20px] m-[25px]">Messages</div>
       <div>
         <ul className="flex flex-col">

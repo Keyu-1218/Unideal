@@ -16,6 +16,7 @@ import { PHOTO_DOWNLOAD_URL } from "@/config/api";
 import type { RootState } from "@/store/store";
 import { useGetProductsQuery } from "@/store/productsApi";
 import { useGetConversationsQuery } from "@/store/chatApi";
+import ScheduleTimeModal from "./ScheduleTimeModal";
 
 const BUYER_TASKS = [
   "Complete Payment",
@@ -34,6 +35,7 @@ const ProductShortDescription = () => {
   const [isTodoOpen, setIsTodoOpen] = useState(true);
   const [isLocationOpen, setIsLocationOpen] = useState(true);
   const [isTimeOpen, setIsTimeOpen] = useState(true);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
   const { conversationId } = useParams<{ conversationId: string }>();
 
@@ -59,7 +61,7 @@ const ProductShortDescription = () => {
   // Loading states
   if (isProductsLoading || isConvosLoading) {
     return (
-      <aside className="w-[375px] h-dvh p-5 flex items-center justify-center">
+      <aside className="w-[320px] h-dvh p-5 flex items-center justify-center">
         <p className="text-gray-500">Loading...</p>
       </aside>
     );
@@ -73,7 +75,7 @@ const ProductShortDescription = () => {
   // Conversation not found
   if (!currentConversation) {
     return (
-      <aside className="w-[375px] h-dvh p-5 flex items-center justify-center">
+      <aside className="w-[320px] h-dvh p-5 flex items-center justify-center">
         <p className="text-red-500 text-center">Conversation not found</p>
       </aside>
     );
@@ -82,7 +84,7 @@ const ProductShortDescription = () => {
   // Product not found
   if (!product) {
     return (
-      <aside className="w-[375px] h-dvh p-5 flex items-center justify-center">
+      <aside className="w-[320px] h-dvh p-5 flex items-center justify-center">
         <p className="text-gray-500 text-center">Product not found</p>
       </aside>
     );
@@ -94,8 +96,13 @@ const ProductShortDescription = () => {
 
   const otherPersonName = isBuyer ? "Seller" : "Buyer";
 
+  const handleScheduleSubmit = (availability: { date: Date; slots: string[] }[]) => {
+    console.log("Selected availability:", availability);
+    // TODO: 调用 API 将时间发送给后端或发送消息给对方
+  };
+
   return (
-    <aside className="w-[375px] h-dvh border-l bg-[#F3F6F2] flex flex-col">
+    <aside className="w-[320px] h-dvh border-l bg-[#F3F6F2] flex flex-col">
       <div className="flex-1 overflow-y-auto px-5 py-6">
         {/* Seller/Buyer Info */}
         <div className="flex items-center justify-between mb-4 w-7/8 mx-auto">
@@ -105,7 +112,7 @@ const ProductShortDescription = () => {
             </p>
             <div className="text-xs text-[#5E836C] font-semibold">⭐ 4.8</div>
           </div>
-          <UserAvatar label={otherPersonName} size="md" />
+          <UserAvatar label={otherPersonName} size="sm" />
         </div>
 
         <div className="border-b border-[#B9CFBF] mb-6" />
@@ -185,8 +192,8 @@ const ProductShortDescription = () => {
               <ul className="px-5 pb-5 space-y-3">
                 {tasks.map((label) => (
                   <li key={label} className="flex items-center gap-3">
-                    <Icon name="clock" size={18} />
-                    <span className="text-sm text-black font-bold">{label}</span>
+                    <Icon name="clock" size={16} />
+                    <span className="text-xs text-black font-bold">{label}</span>
                   </li>
                 ))}
               </ul>
@@ -218,10 +225,10 @@ const ProductShortDescription = () => {
             >
               <div className="overflow-hidden">
                 <div className="mt-4">
-                  <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-sm cursor-pointer">
+                  <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-xs cursor-pointer">
                     <Icon
                       name="whiteLocation"
-                      size={12}
+                      size={10}
                       className="cursor-default"
                     />
                     <p className="text-white">{scheduleLabel}</p>
@@ -253,10 +260,13 @@ const ProductShortDescription = () => {
             >
               <div className="overflow-hidden">
                 <div className="mt-4">
-                  <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-sm cursor-pointer">
+                  <button 
+                    onClick={() => setIsScheduleModalOpen(true)}
+                    className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-xs cursor-pointer"
+                  >
                     <Icon
                       name="whiteCalendar"
-                      size={18}
+                      size={16}
                       className="cursor-default"
                     />
                     <p className="text-white">{scheduleLabel}</p>
@@ -280,6 +290,12 @@ const ProductShortDescription = () => {
             </Button>
           </div>
         )}
+
+        <ScheduleTimeModal
+          isOpen={isScheduleModalOpen}
+          onClose={() => setIsScheduleModalOpen(false)}
+          onSubmit={handleScheduleSubmit}
+        />
       </div>
     </aside>
   );

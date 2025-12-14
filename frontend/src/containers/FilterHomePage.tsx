@@ -10,8 +10,7 @@ import { useSearchParams } from "react-router-dom";
 import debounce from "lodash.debounce";
 
 const FilterHomePage = () => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [distance, setDistance] = useState(3);
   const [locations, setLocations] = useState<string[]>([]);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -23,39 +22,41 @@ const FilterHomePage = () => {
   const updateDistanceInURL = useMemo(
     () =>
       debounce((value?: number) => {
-        const params = new URLSearchParams(window.location.search);
-        if (typeof value === "number") {
-          params.set("travelDistance", value.toString());
-        } else {
-          params.delete("travelDistance");
-        }
-        setSearchParams(params);
+        setSearchParams((prev) => {
+          const params = new URLSearchParams(prev);
+          if (typeof value === "number") {
+            params.set("travelDistance", value.toString());
+          } else {
+            params.delete("travelDistance");
+          }
+          return params;
+        });
       }, 400),
     [setSearchParams]
   );
 
   const handleDateChange = (
-    dates: [Date | null, Date | null] | Date | null
+    date: Date | null
   ) => {
-    if (Array.isArray(dates)) {
-      const [start, end] = dates;
-      setStartDate(start);
-      setEndDate(end);
+    setStartDate(date);
 
-      if (start) {
-        const formatedStartDate = start.toISOString().split("T")[0];
-        searchParams.set("available_from", formatedStartDate);
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (date) {
+        // Use local time to avoid timezone issues (e.g. UTC showing yesterday)
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const formattedDate = `${year}-${month}-${day}`;
+        
+        newParams.set("available_from", formattedDate);
+        newParams.set("available_to", formattedDate);
       } else {
-        searchParams.delete("available_from");
+        newParams.delete("available_from");
+        newParams.delete("available_to");
       }
-      if (end) {
-        const formatedEndDate = end.toISOString().split("T")[0];
-        searchParams.set("available_to", formatedEndDate);
-      } else {
-        searchParams.delete("available_to");
-      }
-      setSearchParams(searchParams);
-    }
+      return newParams;
+    });
   };
 
   const handleDistanceChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -95,13 +96,37 @@ const FilterHomePage = () => {
   };
 
   useEffect(() => {
-    if (!searchParams) {
-      setStartDate(null);
-      setEndDate(null);
+    const availableFrom = searchParams.get("available_from");
+
+    if (!availableFrom) {
+      const today = new Date();
+      setStartDate(today);
       setLocations([]);
       setDistance(3);
+
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const formattedDate = `${year}-${month}-${day}`;
+
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set("available_from", formattedDate);
+        newParams.set("available_to", formattedDate);
+        return newParams;
+      }, { replace: true });
+    } else {
+      const dateFromUrl = new Date(availableFrom);
+      if (!isNaN(dateFromUrl.getTime())) {
+        setStartDate((prev) => {
+          if (!prev || prev.toDateString() !== dateFromUrl.toDateString()) {
+            return dateFromUrl;
+          }
+          return prev;
+        });
+      }
     }
-  }, [searchParams]);
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     if (hasAdvancedLocation) {
@@ -121,8 +146,8 @@ const FilterHomePage = () => {
     if (!startDate) {
       return "";
     }
-    return formatCalendarDate(startDate, endDate ?? startDate);
-  }, [startDate, endDate]);
+    return formatCalendarDate(startDate, startDate);
+  }, [startDate]);
 
   return (
     <div className="flex flex-col gap-8 max-w-[394px] bg-background-light rounded-[8px] pt-5 pr-3.5 pl-4 pb-9">
@@ -133,9 +158,6 @@ const FilterHomePage = () => {
         <DatePicker
           selected={startDate}
           onChange={handleDateChange}
-          startDate={startDate}
-          endDate={endDate}
-          selectsRange
           placeholderText="mm/dd/yyyy"
           value={calendarValue}
           customInput={
