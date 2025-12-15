@@ -27,5 +27,4 @@ app.get('/boom', (_req, _res) => {
 app.use("/auth", authRoutes);
 app.use("/products", productsRouter);
 
-
 export default app;

@@ -368,8 +368,12 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                 
                 <DatePicker
                   inline
-                  selected={null} 
-                  onChange={handleDateSelect}
+                  selected={null}
+                  onChange={(date) => {
+                    if (date instanceof Date) {
+                      handleDateSelect(date);
+                    }
+                  }}
                   minDate={new Date()}
                   maxDate={addDays(new Date(), 6)} 
                   highlightDates={selectedDates} 

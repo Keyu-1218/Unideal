@@ -9,6 +9,7 @@ import { Handler } from "express";
 import { filter as filterByPickupDate } from "../filters/product-pickup-date";
 import { filter as filterByPickupAddress } from "../filters/product-pickup-address";
 import { filter as filterByOwned } from "../filters/product-owned";
+import { sql } from "../db";
 
 export default class ProductService {
     private readonly productRepository = new ProductRepository();
@@ -62,6 +63,43 @@ export default class ProductService {
             products,
             query.owned === 'true' ? sellerId : undefined,
         );
+
+        // Filter out own products and dibsed products from homepage
+        if (query.owned !== 'true') {
+            try {
+                // Get all product IDs that have been dibsed (have conversations)
+                const dibsedProducts = await sql`
+                    SELECT DISTINCT product FROM conversations
+                `;
+                const dibsedProductIds = new Set(
+                    dibsedProducts.map((row: any) => row.product)
+                );
+
+                const productRepository = new ProductRepository();
+                const filteredProducts = [];
+                
+                for (const product of products) {
+                    // Skip dibsed products
+                    if (dibsedProductIds.has(product.id)) {
+                        continue;
+                    }
+                    
+                    // Skip own products if user is logged in
+                    if (sellerId) {
+                        const productSeller = await productRepository.readSeller(product.id);
+                        if (productSeller === sellerId) {
+                            continue;
+                        }
+                    }
+                    
+                    filteredProducts.push(product);
+                }
+                products = filteredProducts;
+            } catch (err) {
+                console.error("Error filtering products:", err);
+                // If filtering fails, continue with unfiltered products
+            }
+        }
 
         const productIds = products.map(p => p.id);
         let complexProducts = [];

@@ -4,20 +4,17 @@ import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "@/styles/custom-datepicker.css";
-import { MultiSelect } from "@/components/Multiselect";
 import { formatCalendarDate } from "@/helpers/formatCalendarDate";
 import { useSearchParams } from "react-router-dom";
 import debounce from "lodash.debounce";
 
 const FilterHomePage = () => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [distance, setDistance] = useState(3);
-  const [locations, setLocations] = useState<string[]>([]);
-  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-  const [advancedLocation, setAdvancedLocation] = useState("");
+  const [locationText, setLocationText] = useState("");
+  const [haveCar, setHaveCar] = useState(false);
+  const [travelTime, setTravelTime] = useState<"none" | "15" | "30" | "45" | "60">("none");
 
   const [searchParams, setSearchParams] = useSearchParams();
-
 
   const updateDistanceInURL = useMemo(
     () =>
@@ -32,6 +29,23 @@ const FilterHomePage = () => {
           return params;
         });
       }, 400),
+    [setSearchParams]
+  );
+
+  const updateLocationInURL = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchParams((prev) => {
+          const params = new URLSearchParams(prev);
+          if (value.trim()) {
+            params.set("location", value.trim());
+          } else {
+            params.delete("location");
+            params.delete("travelDistance");
+          }
+          return params;
+        });
+      }, 500),
     [setSearchParams]
   );
 
@@ -59,64 +73,62 @@ const FilterHomePage = () => {
     });
   };
 
-  const handleDistanceChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDistance(Number(e.target.value));
+  const handleLocationInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocationText(value);
   };
 
-  const handleAdvancedLocationChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.value;
-    setAdvancedLocation(value);
-
-    const params = new URLSearchParams(window.location.search);
-    if (value.trim()) {
-      params.set("preciseLocation", value);
-    } else {
-      params.delete("preciseLocation");
+  const handleLocationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      updateLocationInURL(locationText);
     }
-    setSearchParams(params);
   };
 
-  const toggleAdvancedSection = () => {
-    setIsAdvancedOpen((prev) => !prev);
+  const toggleHaveCar = () => {
+    setHaveCar((prev) => {
+      const next = !prev;
+      setSearchParams((prevParams) => {
+        const params = new URLSearchParams(prevParams);
+        if (next) params.set("haveCar", "true");
+        else params.delete("haveCar");
+        return params;
+      });
+      return next;
+    });
   };
 
-  const hasAdvancedLocation = advancedLocation.trim().length > 0;
-
-  const handleLocationChange = (newLocations: string[]) => {
-    setLocations(newLocations);
-
-    if (newLocations.length > 0) {
-      searchParams.set("location", newLocations.join(","));
-    } else {
-      searchParams.delete("location");
+  const handleTravelTimeChange = (value: "none" | "15" | "30" | "45" | "60") => {
+    setTravelTime(value);
+    if (!locationText.trim()) return;
+    if (value === "none") {
+      updateDistanceInURL(undefined);
+      return;
     }
-    setSearchParams(searchParams);
+    // Map time to minutes for filtering
+    const map: Record<string, number> = { "15": 15, "30": 30, "45": 45, "60": 60 };
+    const minutes = map[value];
+    updateDistanceInURL(minutes);
   };
 
+  // Removed mount-time URL initialization to avoid first heavy refresh
+
+  // Sync URL params to component state when user navigates with browser back/forward
   useEffect(() => {
-    const availableFrom = searchParams.get("available_from");
+    const urlLocation = searchParams.get("location") || "";
+    const urlHaveCar = searchParams.get("haveCar") === "true";
+    const urlTravelDistance = searchParams.get("travelDistance");
+    const urlDate = searchParams.get("available_from");
 
-    if (!availableFrom) {
-      const today = new Date();
-      setStartDate(today);
-      setLocations([]);
-      setDistance(3);
-
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, "0");
-      const day = String(today.getDate()).padStart(2, "0");
-      const formattedDate = `${year}-${month}-${day}`;
-
-      setSearchParams((prev) => {
-        const newParams = new URLSearchParams(prev);
-        newParams.set("available_from", formattedDate);
-        newParams.set("available_to", formattedDate);
-        return newParams;
-      }, { replace: true });
-    } else {
-      const dateFromUrl = new Date(availableFrom);
+    // Only update if different from current state (avoid unnecessary renders)
+    if (urlLocation !== locationText) {
+      setLocationText(urlLocation);
+    }
+    if (urlHaveCar !== haveCar) {
+      setHaveCar(urlHaveCar);
+    }
+    if (urlDate) {
+      const dateFromUrl = new Date(urlDate);
       if (!isNaN(dateFromUrl.getTime())) {
         setStartDate((prev) => {
           if (!prev || prev.toDateString() !== dateFromUrl.toDateString()) {
@@ -126,21 +138,26 @@ const FilterHomePage = () => {
         });
       }
     }
-  }, [searchParams, setSearchParams]);
-
-  useEffect(() => {
-    if (hasAdvancedLocation) {
-      updateDistanceInURL(distance);
+    if (urlTravelDistance) {
+      const mapRev: Record<number, "15" | "30" | "45" | "60"> = {
+        15: "15",
+        30: "30",
+        45: "45",
+        60: "60",
+      } as any;
+      const v = Number(urlTravelDistance);
+      setTravelTime(mapRev[v] || "15");
     } else {
-      updateDistanceInURL(undefined);
+      setTravelTime("none");
     }
-  }, [hasAdvancedLocation, distance, updateDistanceInURL]);
+  }, [searchParams]);
 
   useEffect(() => {
     return () => {
       updateDistanceInURL.cancel();
+      updateLocationInURL.cancel();
     };
-  }, [updateDistanceInURL]);
+  }, [updateDistanceInURL, updateLocationInURL]);
 
   const calendarValue = useMemo(() => {
     if (!startDate) {
@@ -149,89 +166,81 @@ const FilterHomePage = () => {
     return formatCalendarDate(startDate, startDate);
   }, [startDate]);
 
+  const isLocationFilled = locationText.trim().length > 0;
+
   return (
-    <div className="flex flex-col gap-8 max-w-[394px] bg-background-light rounded-[8px] pt-5 pr-3.5 pl-4 pb-9">
-      {/* --- Pick-up Date --- */}
+    <div className="flex flex-col gap-8 max-w-[394px] bg-background-light rounded-[10px] py-8 px-6">
+      {/* Pick-up Date */}
       <div className="flex gap-4 items-center">
-        <Icon name="calendar" size={26} />
-        <span className="flex-1">Pick-up Date</span>
+        <Icon name="calendar" size={28} />
+        <span className="flex-1">Pickup Date</span>
         <DatePicker
           selected={startDate}
           onChange={handleDateChange}
           placeholderText="mm/dd/yyyy"
           value={calendarValue}
           customInput={
-            <Input className="w-[200px] h-7 text-center text-xs text-black placeholder-[#719781] bg-[#EBEBEB] rounded-md px-2 py-1 border border-transparent" />
+            <Input className="w-[160px] h-7 text-center text-xs font-semibold text-green-dark placeholder-[#719781] bg-white rounded-full px-0 py-1 border border-transparent" />
           }
         />
       </div>
 
-      {/* --- City --- */}
-      <div className="flex gap-4 items-center">
-        <Icon name="location" size={21} />
-        <span className="flex-1">City</span>
-        <MultiSelect onChange={handleLocationChange} locations={locations} />
+      {/* Your Location */}
+      <div className="flex gap-4 items-center pl-1">
+        <Icon name="location" size={18} />
+        <span className="flex-1">Your Location</span>
+        <Input
+          className="w-[160px] h-7 text-xs text-black text-center placeholder-[#C7CFCA] bg-white rounded-full px-4 py-1 border border-transparent"
+          value={locationText}
+          onChange={handleLocationInput}
+          onKeyDown={handleLocationKeyDown}
+          placeholder="Type: aalto"
+        />
       </div>
 
-      {/* --- Advanced toggle --- */}
-      <button
-        type="button"
-        onClick={toggleAdvancedSection}
-        className="flex items-center gap-2 pl-[46px] text-green-dark text-sm font-semibold"
-      >
-        Advanced Location Setting
-        <span
-          className={`transition-transform duration-200 ${
-            isAdvancedOpen ? "" : "rotate-180"
-          }`}
+      {/* Have Cars? */}
+      <div className={`flex gap-4 items-center pl-1 ${isLocationFilled ? "" : "opacity-50 pointer-events-none"}`}>
+        <Icon name="car" size={24} />
+        <span className="flex-1">Have Cars?</span>
+        <button
+          type="button"
+          onClick={toggleHaveCar}
+          className={`relative w-[68px] h-8 rounded-full transition-all duration-400 ease-in-out ${haveCar ? "bg-green-dark" : "bg-[#EBEBEB]"}`}
         >
-          <Icon name="toggle" size={16} />
-        </span>
-      </button>
+          <span
+            className={`absolute top-1/2 -translate-y-1/2 w-[20px] h-[20px] rounded-full shadow-sm transition-all duration-400 ease-in-out ${haveCar ? "left-[41px] bg-white" : "left-2 bg-[#D9D9D9]"}`}
+          ></span>
+          <span className={`absolute inset-0 flex items-center text-xs font-semibold transition-opacity duration-400 ${haveCar ? "justify-start pl-3 text-white" : "justify-end pr-3 text-[#5E836C]"}`}>
+            {haveCar ? "YES" : "NO"}
+          </span>
+        </button>
+      </div>
 
-      {isAdvancedOpen && (
-        <div className="flex flex-col gap-6">
-          {/* --- Advanced Location --- */}
-          <div className="flex gap-4 items-center">
-            <Icon name="location" size={21} />
-            <span className="flex-1">Location</span>
-            <Input
-              className="w-[200px] h-7 text-xs text-black placeholder-[#719781] bg-[#EBEBEB] rounded-md px-2 py-1 border border-transparent"
-              value={advancedLocation}
-              onChange={handleAdvancedLocationChange}
-              placeholder="Enter pick-up location"
-            />
-          </div>
-
-          {/* --- Distance --- */}
-          <div
-            className={`transition-opacity duration-200 ${
-              hasAdvancedLocation
-                ? "opacity-100"
-                : "opacity-50 pointer-events-none"
-            }`}
+      {/* Travel Time within */}
+      <div className={`flex gap-4 items-center pl-1 ${isLocationFilled ? "" : "opacity-50 pointer-events-none"}`}>
+        <Icon name="travel" size={24} />
+        <span className="flex-1">Travel Time within</span>
+        <div className="relative">
+          <select
+            value={travelTime}
+            onChange={(e) => handleTravelTimeChange(e.target.value as any)}
+            disabled={!isLocationFilled}
+            className="appearance-none w-[115px] h-8 pl-6 pr-8 text-center text-sm font-semibold text-green-dark bg-white rounded-full border border-transparent cursor-pointer"
           >
-            <div className="flex gap-4 items-center mb-2">
-              <Icon name="distance" size={30} />
-              <span className="flex-1">Distance</span>
-              <span className="w-[200px] text-right text-green-light font-bold">
-                {distance}km
-              </span>
-            </div>
-            <div className="pl-[46px]">
-              <input
-                type="range"
-                disabled={!hasAdvancedLocation}
-                min="1"
-                max="500"
-                value={distance}
-                onChange={handleDistanceChange}
-                className="range-slider"
-              />
-            </div>
-          </div>
+            <option value="none">No limit</option>
+            <option value="15">15min</option>
+            <option value="30">30min</option>
+            <option value="45">45min</option>
+            <option value="60">1h</option>
+          </select>
+          <Icon
+            name="toggle"
+            size={10}
+            className="rotate-180 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-green-light"
+          />
+          
         </div>
-      )}
+      </div>
     </div>
   );
 };

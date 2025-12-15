@@ -8,11 +8,13 @@ import { useState, useMemo } from "react";
 
 const ProductList = () => {
   const [searchParams] = useSearchParams();
-  const queryParams = Object.fromEntries(searchParams.entries());
+  const queryParamsRaw = Object.fromEntries(searchParams.entries());
+  // For mock/demo: avoid backend distance matrix filtering by removing
+  // location and travelDistance from API query. We filter client-side.
+  const { location: _loc, travelDistance: _td, ...queryParams } = queryParamsRaw;
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isLoading, isFetching, error } =
-    useGetProductsQuery(queryParams);
+  const { data, isLoading, isFetching, error } = useGetProductsQuery(queryParams);
 
   const products = data?.products ?? [];
 

@@ -16,4 +16,4 @@ VALUES (1, 'Artek 66 Chair', 'Classic Artek Chair 66 by Alvar Aalto, white lamin
        (1, 'Table Lamp', 'Tradition Flowerpot VP9 matte grey cordless table lamp by Verner Panton. Used 1.5 years, good condition with minor mark. Includes charging cable and adjustable three-stage dimmer.', 60),
        (1, 'Sheep Stool', 'Adorable sheep-shaped stool (“lammasjakkara”). Softly charming, ideal for kids or cozy corners. Used but in good, intact condition.', 20),
        (1, 'Occasional Table', 'For sale is a very clean Vitra Eames LTE Occasional table. Mainly used as a decoration, and sold as unnecessary.', 90),
-       (1, 'Handmade Bedside Table', 'Handmade solid birch nightstandwith a natural finish and a practical drawer — beautifully crafted for the bedroom or living-room side, excellent condition.', 60);
+       (1, 'Bedside Table', 'Handmade solid birch nightstandwith a natural finish and a practical drawer — beautifully crafted for the bedroom or living-room side, excellent condition.', 60);

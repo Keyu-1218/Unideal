@@ -41,7 +41,7 @@ const ConversationListItem = ({
       }`}
       onClick={onClick}
     >
-      <div className="flex gap-5">
+      <div className="flex gap-4">
         <UserAvatar label={otherPersonName} size="sm" />
         <div className="flex flex-col justify-center gap-2">
           <span className="font-bold text-[14px]">{otherPersonName}</span>
@@ -71,7 +71,7 @@ const ConversationList = () => {
 
   if (isLoading) {
     return (
-      <aside className="w-[230px] h-dvh border-r flex items-center justify-center">
+      <aside className="w-full h-dvh border-r flex items-center justify-center">
         <Spinner />
       </aside>
     );
@@ -79,7 +79,7 @@ const ConversationList = () => {
 
   if (error) {
     return (
-      <aside className="w-[230px] h-dvh border-r">
+      <aside className="w-full h-dvh border-r">
         <div className="font-bold text-[20px] m-[25px]">Messages</div>
         <div className="flex items-center justify-center h-[calc(100%-80px)]">
           <p className="text-red-500 text-sm px-4 text-center">
@@ -92,7 +92,7 @@ const ConversationList = () => {
 
   if (!conversations || conversations.length === 0) {
     return (
-      <aside className="w-[230px] h-dvh border-r">
+      <aside className="w-full h-dvh border-r">
         <div className="font-bold text-[20px] m-[25px]">Messages</div>
         <div className="flex flex-col items-center justify-center h-[calc(100%-80px)] px-6">
           <div className="mb-4">
@@ -122,7 +122,7 @@ const ConversationList = () => {
   }
 
   return (
-    <aside className="w-[230px] h-dvh border-r">
+    <aside className="w-full h-dvh border-r">
       <div className="font-bold text-[20px] m-[25px]">Messages</div>
       <div>
         <ul className="flex flex-col">

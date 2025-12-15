@@ -23,7 +23,7 @@ const MessageItem = ({ message, allMessages }: { message: Message; allMessages: 
   const rawName = otherUser?.username || (currentConversation?.is_buyer ? "Seller" : "Buyer");
   const otherPersonName = rawName.includes("@") ? rawName.split("@")[0] : rawName;
 
-  const selfName = user?.username || user?.email?.split('@')[0] || "Me";
+  const selfName = user?.email?.split('@')[0] || "Me";
 
   let displayContent = message.content;
   let isScheduleProposal = false;

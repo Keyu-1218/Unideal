@@ -110,6 +110,11 @@ const ProductInfoCard = ({ product }: { product: Product }) => {
             </span>
           </div>
         </div>
+        <img 
+          src="/mapInDetail.png" 
+          alt="Pickup location map" 
+          className="w-full mt-8 rounded-2xl"
+        />
         <Button
           disabled={isLoading || isSendingInitialMessage || isOwnProduct}
           className="w-full text-xl font-normal bg-green-dark hover:bg-green-dark hover:opacity-90 py-6 mt-8 hover:cursor-pointer"

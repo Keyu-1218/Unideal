@@ -18,6 +18,7 @@ import type { RootState } from "@/store/store";
 import { useGetProductsQuery } from "@/store/productsApi";
 import { useGetConversationsQuery, useGetMessagesQuery, useSendMessageMutation } from "@/store/chatApi";
 import ScheduleTimeModal from "./ScheduleTimeModal";
+import ScheduleLocationModal from "./ScheduleLocationModal";
 
 const BUYER_TASKS = [
   "Complete Payment",
@@ -37,6 +38,7 @@ const ProductShortDescription = () => {
   const [isLocationOpen, setIsLocationOpen] = useState(true);
   const [isTimeOpen, setIsTimeOpen] = useState(true);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [sendMessage] = useSendMessageMutation();
 
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -71,6 +73,11 @@ const ProductShortDescription = () => {
     .reverse()
     .find((m) => m.content.startsWith("SCHEDULE_PROPOSAL::"));
 
+  const locationMessage = messages
+    ?.slice()
+    .reverse()
+    .find((m) => m.content.startsWith("You can pick up at "));
+
   const scheduleData = useMemo(() => {
     if (!scheduleMessage) return null;
     try {
@@ -95,6 +102,21 @@ const ProductShortDescription = () => {
   const confirmedTimeStr = isConfirmed
     ? latestRelevantMessage?.content.replace("PICKUP_CONFIRMED::", "")
     : null;
+
+  const pickupLocationStr = locationMessage
+    ? locationMessage.content.replace("You can pick up at ", "").replace(/\.$/, "")
+    : null;
+
+  // Parse pickupLocationStr into location and description
+  // Format: "location (description)" or just "location"
+  const parsedLocation = (() => {
+    if (!pickupLocationStr) return { location: "", description: "" };
+    const match = pickupLocationStr.match(/^(.+?)\s*\((.+?)\)$/);
+    if (match) {
+      return { location: match[1].trim(), description: match[2].trim() };
+    }
+    return { location: pickupLocationStr, description: "" };
+  })();
 
   const isScheduleSender = scheduleMessage?.sender === currentUserId;
 
@@ -131,12 +153,14 @@ const ProductShortDescription = () => {
   }
 
   const photos = product.photos ?? [];
-  const completedCount = confirmedTimeStr ? 1 : 0;
+  const completedCount = (confirmedTimeStr ? 1 : 0) + (pickupLocationStr ? 1 : 0);
   const todoLabel = `TODO List · ${completedCount}/${tasks.length}`;
   const otherUser = (isBuyer ? currentConversation?.seller : currentConversation?.buyer) as any;
   const rawName = otherUser?.username || (isBuyer ? "Seller" : "Buyer");
   const otherPersonName = rawName.includes("@") ? rawName.split("@")[0] : rawName;
   const scheduleLabel = `Schedule with ${otherPersonName}`;
+  const locationButtonText = isBuyer ? "Waiting for Seller's Location" : scheduleLabel;
+  const isLocationButtonDisabled = !!isBuyer;
 
   // Determine Button State
   let buttonText = scheduleLabel;
@@ -267,7 +291,7 @@ const ProductShortDescription = () => {
             </div>
             <Icon
               name="toggle"
-              size={18}
+              size={14}
               className={isTodoOpen ? "" : "rotate-180"}
             />
           </button>
@@ -279,7 +303,9 @@ const ProductShortDescription = () => {
             <div className="overflow-hidden">
               <ul className="px-5 pb-5 space-y-3">
                 {tasks.map((label) => {
-                  const isCompleted = label === "Schedule a Pickup Time Slot" && !!confirmedTimeStr;
+                  const isCompleted =
+                    (label === "Schedule a Pickup Time Slot" && !!confirmedTimeStr) ||
+                    (label === "Schedule a Pickup Location" && !!pickupLocationStr);
                   return (
                     <li key={label} className="flex items-center gap-3">
                       <Icon name={isCompleted ? "check" : "clock"} size={16} />
@@ -295,20 +321,34 @@ const ProductShortDescription = () => {
         {/* Pickup Location & Time */}
         <div className="space-y-4">
           <div className="bg-[#E9F1EB] rounded-2xl px-5 py-4 border border-[#B9CFBF]">
-            <button
-              type="button"
-              className="w-full flex items-center justify-between text-left"
+            <div
+              className="w-full flex items-center justify-between text-left cursor-pointer"
               onClick={() => setIsLocationOpen((prev) => !prev)}
             >
-              <span className="text-[14px] font-bold text-green-dark">
-                Pickup Location
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[14px] font-bold text-green-dark">
+                  Pickup Location
+                </span>
+                {pickupLocationStr && !isBuyer && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsLocationModalOpen(true);
+                    }}
+                    className="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <Icon name="reschedule" size={12} />
+                    <span className="text-xs">Reschedule</span>
+                  </button>
+                )}
+              </div>
               <Icon
                 name="toggle"
-                size={18}
+                size={14}
                 className={isLocationOpen ? "" : "rotate-180"}
               />
-            </button>
+            </div>
             <div
               className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
                 isLocationOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
@@ -316,14 +356,32 @@ const ProductShortDescription = () => {
             >
               <div className="overflow-hidden">
                 <div className="mt-4">
-                  <button className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-xs cursor-pointer">
-                    <Icon
-                      name="whiteLocation"
-                      size={10}
-                      className="cursor-default"
-                    />
-                    <p className="text-white">{scheduleLabel}</p>
-                  </button>
+                  {pickupLocationStr ? (
+                    <div className="w-full flex items-center justify-center py-2">
+                      <p className="text-black font-bold text-base text-center px-2">
+                        {pickupLocationStr}
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (!isLocationButtonDisabled) setIsLocationModalOpen(true);
+                      }}
+                      disabled={isLocationButtonDisabled}
+                      className={`w-full flex items-center justify-center gap-2 rounded-full font-semibold py-2 text-xs ${
+                        isLocationButtonDisabled
+                          ? "bg-[#B9CFBF] cursor-not-allowed"
+                          : "bg-green-light text-green-dark cursor-pointer"
+                      }`}
+                    >
+                      <Icon
+                        name="whiteLocation"
+                        size={10}
+                        className="cursor-default"
+                      />
+                      <p className="text-white">{locationButtonText}</p>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -352,7 +410,7 @@ const ProductShortDescription = () => {
               </div>
               <Icon
                 name="toggle"
-                size={18}
+                size={14}
                 className={isTimeOpen ? "" : "rotate-180"}
               />
             </div>
@@ -408,6 +466,26 @@ const ProductShortDescription = () => {
             </Button>
           </div>
         )}
+
+        {/* Location Modal (Seller triggers) */}
+        <ScheduleLocationModal
+          isOpen={isLocationModalOpen}
+          onClose={() => setIsLocationModalOpen(false)}
+          title="Pickup Location"
+          initialLocation={pickupLocationStr ? parsedLocation.location : (product.pickup?.address?.street || "")}
+          initialDescription={pickupLocationStr ? parsedLocation.description : ""}
+          onSubmit={async (payload) => {
+            const locationStr = `${payload.location}${payload.description ? ` (${payload.description})` : ""}`;
+            try {
+              await sendMessage({
+                conversationId: Number(conversationId),
+                content: `You can pick up at ${locationStr}.`,
+              }).unwrap();
+            } catch (e) {
+              // ignore send failure here
+            }
+          }}
+        />
 
         <ScheduleTimeModal
           isOpen={isScheduleModalOpen}
