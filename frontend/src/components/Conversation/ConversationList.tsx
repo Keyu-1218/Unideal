@@ -1,8 +1,58 @@
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetConversationsQuery } from "@/store/chatApi";
+import { useGetConversationsQuery, useGetMessagesQuery } from "@/store/chatApi";
 import UserAvatar from "../UserAvatar";
 import { Spinner } from "../ui/spinner";
+
+const ConversationListItem = ({
+  conversation,
+  isActive,
+  onClick,
+}: {
+  conversation: any;
+  isActive: boolean;
+  onClick: () => void;
+}) => {
+  const { data: messages } = useGetMessagesQuery(conversation.id, {
+    skip: !conversation.id,
+  });
+
+  const latestRelevantMessage = messages
+    ?.slice()
+    .reverse()
+    .find(
+      (m) =>
+        m.content.startsWith("SCHEDULE_PROPOSAL::") ||
+        m.content.startsWith("PICKUP_CONFIRMED::")
+    );
+
+  const isConfirmed = latestRelevantMessage?.content.startsWith("PICKUP_CONFIRMED::");
+  const completedCount = isConfirmed ? 1 : 0;
+  const totalCount = conversation.is_buyer ? 4 : 3;
+
+  const otherUser = (conversation.is_buyer ? conversation.seller : conversation.buyer) as any;
+  const rawName = otherUser?.username || (conversation.is_buyer ? "Seller" : "Buyer");
+  const otherPersonName = rawName.includes("@") ? rawName.split("@")[0] : rawName;
+
+  return (
+    <li
+      className={`border-b-2 pl-6 py-3 hover:cursor-pointer transition-colors ${
+        isActive ? "bg-background-gray" : "hover:bg-background-light"
+      }`}
+      onClick={onClick}
+    >
+      <div className="flex gap-5">
+        <UserAvatar label={otherPersonName} size="sm" />
+        <div className="flex flex-col justify-center gap-2">
+          <span className="font-bold text-[14px]">{otherPersonName}</span>
+          <span className="text-green-dark font-bold text-[10px]">
+            {conversation.is_buyer ? "Buy" : "Sell"} · {conversation.title} · {completedCount}/{totalCount}
+          </span>
+        </div>
+      </div>
+    </li>
+  );
+};
 
 const ConversationList = () => {
   const navigate = useNavigate();
@@ -21,7 +71,7 @@ const ConversationList = () => {
 
   if (isLoading) {
     return (
-      <aside className="w-[280px] h-dvh border-r flex items-center justify-center">
+      <aside className="w-[230px] h-dvh border-r flex items-center justify-center">
         <Spinner />
       </aside>
     );
@@ -29,7 +79,7 @@ const ConversationList = () => {
 
   if (error) {
     return (
-      <aside className="w-[280px] h-dvh border-r">
+      <aside className="w-[230px] h-dvh border-r">
         <div className="font-bold text-[20px] m-[25px]">Messages</div>
         <div className="flex items-center justify-center h-[calc(100%-80px)]">
           <p className="text-red-500 text-sm px-4 text-center">
@@ -42,7 +92,7 @@ const ConversationList = () => {
 
   if (!conversations || conversations.length === 0) {
     return (
-      <aside className="w-[280px] h-dvh border-r">
+      <aside className="w-[230px] h-dvh border-r">
         <div className="font-bold text-[20px] m-[25px]">Messages</div>
         <div className="flex flex-col items-center justify-center h-[calc(100%-80px)] px-6">
           <div className="mb-4">
@@ -72,34 +122,19 @@ const ConversationList = () => {
   }
 
   return (
-    <aside className="w-[280px] h-dvh border-r">
+    <aside className="w-[230px] h-dvh border-r">
       <div className="font-bold text-[20px] m-[25px]">Messages</div>
       <div>
         <ul className="flex flex-col">
           {conversations.map((conversation) => {
             const isActive = activeConversationId === conversation.id;
-            const otherPersonName = conversation.is_buyer ? "Seller" : "Buyer";
-
             return (
-              <li
+              <ConversationListItem
                 key={conversation.id}
-                className={`border-b-2 pl-4 py-5 hover:cursor-pointer transition-colors ${
-                  isActive ? "bg-background-gray" : "hover:bg-background-light"
-                }`}
+                conversation={conversation}
+                isActive={isActive}
                 onClick={() => handleConversationClick(conversation.id)}
-              >
-                <div className="flex gap-5">
-                  <UserAvatar label={otherPersonName} size="md" />
-                  <div className="flex flex-col justify-center gap-2">
-                    <span className="font-bold text-[14px]">
-                      {otherPersonName}
-                    </span>
-                    <span className="text-green-dark font-bold text-[10px]">
-                      Goods · {conversation.title}
-                    </span>
-                  </div>
-                </div>
-              </li>
+              />
             );
           })}
         </ul>

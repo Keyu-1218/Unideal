@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { format } from "date-fns";
 
 import UserAvatar from "@/components/UserAvatar";
 import Icon from "@/components/Icon";
@@ -15,7 +16,7 @@ import {
 import { PHOTO_DOWNLOAD_URL } from "@/config/api";
 import type { RootState } from "@/store/store";
 import { useGetProductsQuery } from "@/store/productsApi";
-import { useGetConversationsQuery } from "@/store/chatApi";
+import { useGetConversationsQuery, useGetMessagesQuery, useSendMessageMutation } from "@/store/chatApi";
 import ScheduleTimeModal from "./ScheduleTimeModal";
 
 const BUYER_TASKS = [
@@ -36,6 +37,7 @@ const ProductShortDescription = () => {
   const [isLocationOpen, setIsLocationOpen] = useState(true);
   const [isTimeOpen, setIsTimeOpen] = useState(true);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [sendMessage] = useSendMessageMutation();
 
   const { conversationId } = useParams<{ conversationId: string }>();
 
@@ -46,6 +48,11 @@ const ProductShortDescription = () => {
   );
   const { data: conversations, isLoading: isConvosLoading } =
     useGetConversationsQuery();
+  
+  const { data: messages } = useGetMessagesQuery(Number(conversationId), {
+    skip: !conversationId,
+    pollingInterval: 3000,
+  });
 
   const currentConversation = conversations?.find(
     (convo) => convo.id === Number(conversationId)
@@ -58,6 +65,39 @@ const ProductShortDescription = () => {
   const isBuyer = currentConversation?.is_buyer;
   const tasks = isBuyer ? BUYER_TASKS : SELLER_TASKS;
 
+  // Logic to find the latest schedule proposal
+  const scheduleMessage = messages
+    ?.slice()
+    .reverse()
+    .find((m) => m.content.startsWith("SCHEDULE_PROPOSAL::"));
+
+  const scheduleData = useMemo(() => {
+    if (!scheduleMessage) return null;
+    try {
+      return JSON.parse(scheduleMessage.content.replace("SCHEDULE_PROPOSAL::", ""));
+    } catch (error) {
+      console.error("Failed to parse schedule data:", error);
+      return null;
+    }
+  }, [scheduleMessage]);
+
+  const latestRelevantMessage = messages
+    ?.slice()
+    .reverse()
+    .find(
+      (m) =>
+        m.content.startsWith("SCHEDULE_PROPOSAL::") ||
+        m.content.startsWith("PICKUP_CONFIRMED::")
+    );
+
+  const isConfirmed = latestRelevantMessage?.content.startsWith("PICKUP_CONFIRMED::");
+
+  const confirmedTimeStr = isConfirmed
+    ? latestRelevantMessage?.content.replace("PICKUP_CONFIRMED::", "")
+    : null;
+
+  const isScheduleSender = scheduleMessage?.sender === currentUserId;
+
   // Loading states
   if (isProductsLoading || isConvosLoading) {
     return (
@@ -69,7 +109,7 @@ const ProductShortDescription = () => {
 
   // No conversation selected
   if (!conversationId) {
-    return;
+    return null;
   }
 
   // Conversation not found
@@ -91,14 +131,62 @@ const ProductShortDescription = () => {
   }
 
   const photos = product.photos ?? [];
-  const todoLabel = `TODO List · 0/${tasks.length}`;
-  const scheduleLabel = "Schedule with Seller";
+  const completedCount = confirmedTimeStr ? 1 : 0;
+  const todoLabel = `TODO List · ${completedCount}/${tasks.length}`;
+  const otherUser = (isBuyer ? currentConversation?.seller : currentConversation?.buyer) as any;
+  const rawName = otherUser?.username || (isBuyer ? "Seller" : "Buyer");
+  const otherPersonName = rawName.includes("@") ? rawName.split("@")[0] : rawName;
+  const scheduleLabel = `Schedule with ${otherPersonName}`;
 
-  const otherPersonName = isBuyer ? "Seller" : "Buyer";
+  // Determine Button State
+  let buttonText = scheduleLabel;
+  let isButtonDisabled = false;
+  let showModal = () => setIsScheduleModalOpen(true);
 
-  const handleScheduleSubmit = (availability: { date: Date; slots: string[] }[]) => {
-    console.log("Selected availability:", availability);
-    // TODO: 调用 API 将时间发送给后端或发送消息给对方
+  if (isBuyer) {
+    if (scheduleData && !isScheduleSender) {
+      buttonText = "Check Seller's Availability";
+      isButtonDisabled = false;
+    } else {
+      buttonText = "Waiting for Seller's Availability";
+      isButtonDisabled = true;
+    }
+  } else {
+    // Seller
+    if (scheduleData && isScheduleSender) {
+      buttonText = "Wait for Buyer to confirm";
+      isButtonDisabled = true;
+    } else {
+      buttonText = scheduleLabel;
+      isButtonDisabled = false;
+    }
+  }
+
+  const handleScheduleSubmit = async (availability: { date: Date; slots: string[] }[]) => {
+    console.log("Submitting schedule:", availability);
+    try {
+      if (isBuyer) {
+        if (availability.length > 0 && availability[0].slots.length > 0) {
+          const date = availability[0].date;
+          const time = availability[0].slots[0];
+          const [h, m] = time.split(":").map(Number);
+          const dateTime = new Date(date);
+          dateTime.setHours(h, m);
+          const formattedTime = format(dateTime, "h:mmaaa, MMM d");
+          await sendMessage({
+            conversationId: Number(conversationId),
+            content: "PICKUP_CONFIRMED::" + formattedTime,
+          }).unwrap();
+        }
+      } else {
+        await sendMessage({
+          conversationId: Number(conversationId),
+          content: "SCHEDULE_PROPOSAL::" + JSON.stringify(availability),
+        }).unwrap();
+      }
+    } catch (error) {
+      console.error("Failed to send schedule message:", error);
+    }
   };
 
   return (
@@ -124,7 +212,7 @@ const ProductShortDescription = () => {
               <CarouselContent className="h-full">
                 {photos.length > 0 ? (
                   photos.map((photo) => (
-                    <CarouselItem key={photo} className="h-full w-full">
+                    <CarouselItem key={photo} className="w-full aspect-[4/5]">
                       <img
                         src={
                           photo.startsWith("http")
@@ -156,14 +244,14 @@ const ProductShortDescription = () => {
         </div>
 
         {/* Product Info */}
-        <div className="mb-6 w-7/8 mx-auto">
-          <h3 className="text-xl font-bold text-green-dark">
+        <div className="mb-4 w-7/8 mx-auto">
+          <h3 className="text-xl font-bold text-green-dark text-center">
             {product.title}
           </h3>
         </div>
 
         {/* TODO List */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#B9CFBF] mb-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-[#B9CFBF] mb-4">
           <button
             type="button"
             className="w-full flex items-center justify-between px-5 py-4 text-left"
@@ -190,12 +278,15 @@ const ProductShortDescription = () => {
           >
             <div className="overflow-hidden">
               <ul className="px-5 pb-5 space-y-3">
-                {tasks.map((label) => (
-                  <li key={label} className="flex items-center gap-3">
-                    <Icon name="clock" size={16} />
-                    <span className="text-xs text-black font-bold">{label}</span>
-                  </li>
-                ))}
+                {tasks.map((label) => {
+                  const isCompleted = label === "Schedule a Pickup Time Slot" && !!confirmedTimeStr;
+                  return (
+                    <li key={label} className="flex items-center gap-3">
+                      <Icon name={isCompleted ? "check" : "clock"} size={16} />
+                      <span className="text-xs text-black font-bold">{label}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
@@ -239,20 +330,32 @@ const ProductShortDescription = () => {
           </div>
 
           <div className="bg-[#E9F1EB] rounded-2xl px-5 py-4 border border-[#B9CFBF]">
-            <button
-              type="button"
-              className="w-full flex items-center justify-between text-left"
+            <div
+              className="w-full flex items-center justify-between text-left cursor-pointer"
               onClick={() => setIsTimeOpen((prev) => !prev)}
             >
-              <span className="text-[14px] font-bold text-green-dark">
-                Pickup Time
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[14px] font-bold text-green-dark">
+                  Pickup Time
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsScheduleModalOpen(true);
+                  }}
+                  className="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <Icon name="reschedule" size={12} />
+                  <span className="text-xs">Reschedule</span>
+                </button>
+              </div>
               <Icon
                 name="toggle"
                 size={18}
                 className={isTimeOpen ? "" : "rotate-180"}
               />
-            </button>
+            </div>
             <div
               className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
                 isTimeOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
@@ -260,17 +363,32 @@ const ProductShortDescription = () => {
             >
               <div className="overflow-hidden">
                 <div className="mt-4">
-                  <button 
-                    onClick={() => setIsScheduleModalOpen(true)}
-                    className="w-full flex items-center justify-center gap-2 rounded-full bg-green-light text-green-dark font-semibold py-2 text-xs cursor-pointer"
-                  >
-                    <Icon
-                      name="whiteCalendar"
-                      size={16}
-                      className="cursor-default"
-                    />
-                    <p className="text-white">{scheduleLabel}</p>
-                  </button>
+                  {confirmedTimeStr ? (
+                    <div className="w-full flex items-center justify-center py-2">
+                      <p className="text-black font-bold text-base">
+                        {confirmedTimeStr}
+                      </p>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => !isButtonDisabled && showModal()}
+                      disabled={isButtonDisabled}
+                      className={`w-full flex items-center justify-center gap-2 rounded-full font-semibold py-2 text-xs ${
+                        isButtonDisabled
+                          ? "bg-[#B9CFBF] cursor-not-allowed"
+                          : "bg-green-light text-green-dark cursor-pointer"
+                      }`}
+                    >
+                      <Icon
+                        name="whiteCalendar"
+                        size={16}
+                        className="cursor-default"
+                      />
+                      <p className="text-white">
+                        {buttonText}
+                      </p>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -279,12 +397,12 @@ const ProductShortDescription = () => {
 
         {isBuyer && (
           <div className="flex items-center gap-3 mt-6 justify-between">
-            <Button className="flex-1 bg-green-dark hover:bg-green-dark hover:opacity-90 text-white font-semibold py-6 rounded-4xl w-[145px] h-[34px]">
+            <Button className="flex-1 bg-green-dark hover:bg-green-dark hover:opacity-90 text-white font-semibold py-5 rounded-4xl w-[145px] h-[34px]">
               Go To Payment
             </Button>
             <Button
               variant="outline"
-              className="border-green-dark text-gray-dark font-semibold px-8 py-6 rounded-4xl"
+              className="border-green-dark text-gray-dark font-semibold px-8 py-5 rounded-4xl"
             >
               Undibs
             </Button>
@@ -295,6 +413,9 @@ const ProductShortDescription = () => {
           isOpen={isScheduleModalOpen}
           onClose={() => setIsScheduleModalOpen(false)}
           onSubmit={handleScheduleSubmit}
+          initialData={isBuyer ? scheduleData : null}
+          title={isBuyer ? "Seller's Availability" : "My Availability"}
+          isBuyer={isBuyer}
         />
       </div>
     </aside>

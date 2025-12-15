@@ -23,6 +23,8 @@ const iconMap: Record<IconProps["name"], string> = {
   toggle: "/icons/toggle.svg",
   whiteLocation: "/icons/white-location.svg",
   whiteCalendar: "/icons/white-calendar.svg",
+  reschedule: "/icons/reschedule.svg",
+  check: "/icons/check.svg",
 };
 
 const Icon = ({ name, size = 31, className = "" }: IconProps) => {

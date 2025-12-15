@@ -41,14 +41,26 @@ export default class ConversationRepository {
         `;
     };
 
-    readonly readByUser = async (userId: number): Promise<UserConversation[]> => {
-        const data: UserConversation[] = await sql`
-            SELECT *,
+    readonly readByUser = async (userId: number): Promise<any[]> => {
+        const data = await sql`
+            SELECT 
+                products.*,
+                conversations.*,
                 conversations.id AS id,
-                (buyer = ${userId}) AS is_buyer
+                (conversations.buyer = ${userId}) AS is_buyer,
+                json_build_object(
+                    'id', b.id,
+                    'username', b.email
+                ) as buyer,
+                json_build_object(
+                    'id', s.id,
+                    'username', s.email
+                ) as seller
             FROM conversations
             JOIN products ON conversations.product = products.id
-            WHERE buyer = ${userId} OR products.seller = ${userId}
+            JOIN users b ON conversations.buyer = b.id
+            JOIN users s ON products.seller = s.id
+            WHERE conversations.buyer = ${userId} OR products.seller = ${userId}
         `;
         return data;
     }

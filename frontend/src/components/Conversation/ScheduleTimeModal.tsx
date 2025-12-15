@@ -1,34 +1,43 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// 引入 date-fns 用于处理日期加减和格式化
+// Import date-fns for date manipulation and formatting
 import { addDays, format, isSameDay, setHours, setMinutes } from "date-fns";
 
 // ----------------------
-// 类型定义
+// Type definitions
 // ----------------------
 interface ScheduleTimeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  //最终提交的数据：包含选中的日期，以及每个日期下具体的有空时间段
+  // Final submission data: contains selected dates and specific available time slots for each date
   onSubmit: (availability: { date: Date; slots: string[] }[]) => void;
+  initialData?: { date: string; slots: string[] }[] | null;
+  confirmedData?: { date: string; slots: string[] }[] | null;
+  title?: string;
+  isBuyer?: boolean;
 }
 
 const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  initialData,
+  confirmedData,
+  title,
+  isBuyer,
 }) => {
-  // --- 状态管理 ---
-  const [step, setStep] = useState<1 | 2>(1); // 1: 选日期范围, 2: 选具体时间格
+  // --- State Management ---
+  const [step, setStep] = useState<1 | 2>(1); // 1: Select date range, 2: Select specific time slots
   
   // Step 1 States
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
 
-  // Step 2 States: 记录选中的具体时间块 (格式: "YYYY-MM-DD_HH:mm")
+  // Step 2 States: Record selected specific time blocks (Format: "YYYY-MM-DD_HH:mm")
   const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
+  const [availableSlots, setAvailableSlots] = useState<Set<string>>(new Set());
 
   // Step 2 Dragging States
   const [isDragging, setIsDragging] = useState(false);
@@ -36,14 +45,56 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
   const [dragCurrent, setDragCurrent] = useState<{ dateKey: string; time: string } | null>(null);
   const [dragAction, setDragAction] = useState<"select" | "deselect">("select");
 
-  // --- 初始化与重置 ---
+  const initialDataStr = JSON.stringify(initialData);
+  const isSellerReadOnly = !isBuyer && !!initialData && initialData.length > 0;
+  const isConfirmed = !!confirmedData && confirmedData.length > 0;
+
+  // --- Initialization and Reset ---
   useEffect(() => {
     if (isOpen) {
-      setStep(1);
-      setSelectedDates([]);
-      setSelectedSlots(new Set());
+      // If there is initial data (e.g. from Seller), load it
+      if (initialData && initialData.length > 0) {
+        const dates: Date[] = [];
+        const slots = new Set<string>();
+
+        initialData.forEach((item) => {
+          const dateObj = new Date(item.date);
+          dates.push(dateObj);
+          item.slots.forEach((time) => {
+            slots.add(`${format(dateObj, "yyyy-MM-dd")}_${time}`);
+          });
+        });
+
+        setSelectedDates(dates); 
+        
+        if (confirmedData && confirmedData.length > 0) {
+          // If confirmed, show initialData as available (light green) and confirmedData as selected (dark green)
+          setAvailableSlots(slots);
+          
+          const confirmedSet = new Set<string>();
+          confirmedData.forEach((item) => {
+            const dateObj = new Date(item.date);
+            item.slots.forEach((time) => {
+              confirmedSet.add(`${format(dateObj, "yyyy-MM-dd")}_${time}`);
+            });
+          });
+          setSelectedSlots(confirmedSet);
+        } else if (isBuyer) {
+          setAvailableSlots(slots);
+          setSelectedSlots(new Set());
+        } else {
+          setSelectedSlots(slots);
+          setAvailableSlots(new Set());
+        }
+        setStep(2);
+      } else {
+        setStep(1);
+        setSelectedDates([]);
+        setSelectedSlots(new Set());
+        setAvailableSlots(new Set());
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, initialDataStr, isBuyer, confirmedData]);
 
   // Global mouse up to stop dragging even if mouse leaves the element
   useEffect(() => {
@@ -58,19 +109,19 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
 
   if (!isOpen) return null;
 
-  // --- Step 1 逻辑: 处理日期多选 ---
+  // --- Step 1 Logic: Handle date multi-selection ---
   const handleDateSelect = (date: Date) => {
     const exists = selectedDates.find((d) => isSameDay(d, date));
     if (exists) {
-      // 如果已选，则取消选择
+      // If already selected, deselect
       setSelectedDates(selectedDates.filter((d) => !isSameDay(d, date)));
     } else {
-      // 如果没选，则添加
+      // If not selected, add
       setSelectedDates([...selectedDates, date].sort((a, b) => a.getTime() - b.getTime()));
     }
   };
 
-  // 生成下拉菜单的时间选项 (00:00 - 23:00)
+  // Generate time options for dropdown (00:00 - 23:00)
   const timeOptions = Array.from({ length: 24 }).map((_, i) => {
     const hour = i;
     const label = hour === 0 ? "12:00 AM" : hour < 12 ? `${hour}:00 AM` : hour === 12 ? "12:00 PM" : `${hour - 12}:00 PM`;
@@ -78,7 +129,7 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
     return { value, label };
   });
 
-  // --- Step 2 逻辑: 生成时间网格 ---
+  // --- Step 2 Logic: Generate time grid ---
   const generateTimeSlots = () => {
     const startH = parseInt(startTime.split(":")[0]);
     const endH = parseInt(endTime.split(":")[0]);
@@ -90,12 +141,12 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
       // :30
       slots.push(`${h.toString().padStart(2, "0")}:30`);
     }
-    // 添加最后的结束整点 (如果需要包含结束点本身，通常时间段是左闭右开，这里假设显示到结束前)
-    // 为了UI显示效果，我们通常显示 slot 开始时间
+    // Add the final end hour (if the end point itself needs to be included; usually time slots are left-closed, right-open; assuming display up to before the end here)
+    // For UI display purposes, we usually show the slot start time
     return slots;
   };
 
-  // 生成时间轴标签 (包含结束时间，用于对齐网格线)
+  // Generate timeline labels (including end time, for aligning grid lines)
   const generateTimeLabels = () => {
     const slots = generateTimeSlots();
     if (slots.length === 0) return [];
@@ -129,8 +180,23 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
   };
 
   const handleMouseDown = (dateKey: string, time: string) => {
+    if (isSellerReadOnly) return;
+    if (isConfirmed) return;
+
     const key = `${dateKey}_${time}`;
     const isSelected = selectedSlots.has(key);
+
+    if (isBuyer) {
+      // Buyer can only select from available slots, and only one at a time
+      if (availableSlots.has(key)) {
+        const newSet = new Set<string>();
+        if (!isSelected) {
+          newSet.add(key);
+        }
+        setSelectedSlots(newSet);
+      }
+      return;
+    }
     
     setIsDragging(true);
     setDragStart({ dateKey, time });
@@ -139,6 +205,9 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
   };
 
   const handleMouseEnter = (dateKey: string, time: string) => {
+    if (isSellerReadOnly) return;
+    if (isConfirmed) return;
+    if (isBuyer) return; // Disable dragging for Buyer
     if (!isDragging || !dragStart) return;
     // Only allow dragging within the same day column
     if (dateKey !== dragStart.dateKey) return;
@@ -181,24 +250,24 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
     return isSelectedInState;
   };
 
-  // 格式化显示时间 (09:00 -> 9:00 AM)
+  // Format display time (09:00 -> 9:00 AM)
   const formatTimeDisplay = (timeStr: string) => {
     const [h, m] = timeStr.split(":").map(Number);
     const date = setMinutes(setHours(new Date(), h), m);
     return format(date, "h:mm aa");
   };
 
-  // --- 提交逻辑 ---
+  // --- Submission Logic ---
   const handleFinalSubmit = () => {
-    // 将 Set 转回结构化数据
+    // Convert Set back to structured data
     const result = selectedDates.map(date => {
         const dateKey = format(date, "yyyy-MM-dd");
-        // 找出该日期下所有被选中的 slot
+        // Find all selected slots for this date
         const slotsForDate = Array.from(selectedSlots)
             .filter(key => key.startsWith(dateKey))
-            .map(key => key.split("_")[1]); // 取出 HH:mm
+            .map(key => key.split("_")[1]); // Extract HH:mm
         return { date, slots: slotsForDate };
-    }).filter(item => item.slots.length > 0); // 过滤掉没选时间的日期
+    }).filter(item => item.slots.length > 0); // Filter out dates with no selected times
 
     onSubmit(result);
     onClose();
@@ -210,7 +279,7 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
           step === 1 ? "w-[700px]" : "w-fit min-w-[500px] max-w-[90vw] h-[80vh]"
         } max-h-full min-h-[400px] rounded-2xl px-8 pt-8 pb-6 relative shadow-xl flex flex-col transition-all`}>
         
-        {step === 2 && (
+        {step === 2 && !isSellerReadOnly && !isConfirmed && (
           <button
             onClick={() => setStep(1)}
             className="absolute top-7 left-8 text-gray-500 hover:text-gray-700 font-medium z-10 flex items-center gap-1"
@@ -219,7 +288,7 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
           </button>
         )}
 
-        {/* 关闭按钮 */}
+        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold z-10"
@@ -227,29 +296,29 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
           &times;
         </button>
 
-        {/* ================= STEP 1: 选择日期和范围 ================= */}
+        {/* ================= STEP 1: Select Date and Range ================= */}
         {step === 1 && (
           <div className="flex flex-col h-full pt-2">
             <div className="flex flex-row gap-6 flex-1">
               
-              {/* 左侧: 日历 */}
+              {/* Left side: Calendar */}
               <div className="w-1/2 flex flex-col items-center border-r border-gray-200 pr-4 pt-4">
                 <h3 className="text-md font-semibold text-green-dark mb-4 text-center">
                   What dates might work in 1 week?
                 </h3>
                 
-                {/* 自定义样式的 DatePicker */}
+                {/* Custom styled DatePicker */}
                 <style>{`
                   .react-datepicker { border: none; background: transparent; font-family: inherit; }
                   .react-datepicker__header { background: transparent; border-bottom: none; }
                   .react-datepicker__day-name { color: #666; width: 1.7rem; }
                   .react-datepicker__day { width: 1.7rem; line-height: 1.7rem; margin: 0.1rem; border-radius: 50%; }
-                  /* 强制 hover 状态也保持圆形 */
+                  /* Force hover state to remain circular */
                   .react-datepicker__day:hover {
                     border-radius: 50% !important;
                   }
 
-                  /* 1. 强力清除键盘选中/聚焦时的默认背景 (针对未选中的日期) */
+                  /* 1. Force clear default background on keyboard selection/focus (for unselected dates) */
                   .react-datepicker__day--keyboard-selected:not(.react-datepicker__day--highlighted) { 
                     background-color: transparent !important; 
                     color: inherit !important; 
@@ -257,14 +326,14 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                     outline: none !important;
                   }
 
-                  /* 2. 选中日期的样式 - 深绿色 */
+                  /* 2. Selected date style - Dark Green */
                   .react-datepicker__day--highlighted { 
                     background-color: var(--color-green-dark) !important; 
                     color: white !important; 
                     border-radius: 50%;
                   }
                   
-                  /* 3. 确保聚焦+选中状态也是深绿色 */
+                  /* 3. Ensure focus + selected state is also Dark Green */
                   .react-datepicker__day--highlighted:hover,
                   .react-datepicker__day--highlighted:focus,
                   .react-datepicker__day--highlighted.react-datepicker__day--keyboard-selected {
@@ -274,7 +343,7 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
 
                   .react-datepicker__day--today { font-weight: bold; }
                   
-                  /* 禁用日期 (不可选) 的样式：Hover 时不改变背景色和字体颜色 */
+                  /* Disabled date (unselectable) style: Do not change background color and font color on Hover */
                   .react-datepicker__day--disabled {
                     color: #ccc !important;
                   }
@@ -284,7 +353,7 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                     cursor: default;
                   }
 
-                  /* 自定义下拉框箭头样式 */
+                  /* Custom dropdown arrow style */
                   .custom-select {
                     appearance: none;
                     -webkit-appearance: none;
@@ -299,18 +368,18 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                 
                 <DatePicker
                   inline
-                  selected={null} // 不使用默认的单选 selected
+                  selected={null} 
                   onChange={handleDateSelect}
                   minDate={new Date()}
-                  maxDate={addDays(new Date(), 6)} // 限制只能选未来7天
-                  highlightDates={selectedDates} // 关键：用高亮来显示“多选”
+                  maxDate={addDays(new Date(), 6)} 
+                  highlightDates={selectedDates} 
                   dayClassName={(date) => 
                      selectedDates.find(d => isSameDay(d, date)) ? "font-bold" : ""
                   }
                 />
               </div>
 
-              {/* 右侧: 时间范围 */}
+              {/* Right side: Time range */}
               <div className="w-1/2 pt-4 pl-4 flex flex-col justify-center">
                 <h3 className="text-md font-semibold text-green-dark mb-6 text-center">
                   What times might work?
@@ -353,18 +422,18 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Next 按钮 */}
+                  {/* Next Button */}
                  
                   </div>
 
                   <div className="flex justify-end pt-10">
                     <button
                       onClick={() => setStep(2)}
-                      disabled={selectedDates.length === 0} // 必须选至少一个日期
+                      disabled={selectedDates.length === 0} // Must select at least one date
                       className={`px-8 py-2.5 rounded-full font-semibold text-md transition-colors ${
                         selectedDates.length > 0
-                          ? "bg-green-dark text-white hover:bg-opacity-90 cursor-pointer" // 绿色激活
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed" // 灰色禁用
+                          ? "bg-green-dark text-white hover:bg-opacity-90 cursor-pointer" // Green active
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed" // Gray disabled
                       }`}
                     >
                       Next
@@ -380,20 +449,20 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
         {step === 2 && (
           <div className="flex flex-col h-full w-full min-h-0">
             <h2 className="text-xl font-bold text-green-dark text-center mb-4 shrink-0">
-               Your Availability
+               {title || "My Availability"}
             </h2>
             
-            {/* 时间网格容器 */}
+            {/* Time grid container */}
             <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto border border-gray-200 rounded-xl bg-white p-4">
                <div className="flex flex-row w-fit mx-auto">
-                  {/* --- 新增: 左侧时间轴 --- */}
+                  {/* --- New: Left side timeline --- */}
                   <div className="flex flex-col min-w-[70px] sticky left-0 bg-white z-10 border-r border-gray-100 mr-4">
-                      {/* 占位 Header (与右侧日期 Header 高度一致，确保下方对齐) */}
+                      {/* Placeholder Header (Consistent height with right side date Header to ensure alignment below) */}
                       <div className="mb-4 text-center opacity-0 pointer-events-none">
                           <div className="text-sm uppercase">MMM D</div>
                           <div className="text-lg font-bold">EEE</div>
                       </div>
-                      {/* 时间标签列表 (pt-[1px] 用于补偿右侧容器的 border 宽度) */}
+                      {/* Time label list (pt-[1px] to compensate for right container border width) */}
                       <div className="relative w-full" style={{ height: `${generateTimeSlots().length * 2}rem` }}>
                           {generateTimeLabels().map((time, index) => (
                               <div 
@@ -407,42 +476,59 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                       </div>
                   </div>
 
-                  {/* --- 右侧: 日期列 --- */}
+                  {/* --- Right side: Date columns --- */}
                   <div className="flex flex-row gap-4 flex-1">
-                  {/* 针对每一个选中的日期，渲染一列 */}
+                  {/* Render a column for each selected date */}
                   {selectedDates.map((date, index) => {
                       const timeSlots = generateTimeSlots();
                       return (
                           <div key={index} className="flex flex-col items-center min-w-[100px]">
-                              {/* 列头: 日期 */}
+                              {/* Column Header: Date */}
                               <div className="mb-4 text-center">
                                   <div className="text-gray-500 text-sm uppercase">{format(date, "MMM d")}</div>
                                   <div className="text-green-dark font-bold text-lg">{format(date, "EEE")}</div>
                               </div>
                               
-                              {/* 时间块列表 */}
+                              {/* Time block list */}
                               <div className="flex flex-col gap-2 w-full">
                                 <div className="flex flex-col w-full bg-[#E9F1EB] rounded-lg overflow-hidden border border-gray-300 select-none">
                                     {timeSlots.map((time, idx) => {
                                         const dateKey = format(date, "yyyy-MM-dd");
                                         const isSelected = isSlotSelected(dateKey, time);
+                                        const isAvailable = availableSlots.has(`${dateKey}_${time}`);
                                         const isHourMark = time.endsWith(":30"); // If slot is 09:30, bottom border is 10:00 (Hour mark)
                                         const isLast = idx === timeSlots.length - 1;
+
+                                        let slotClassName = `w-full h-8 flex items-center justify-center text-xs font-medium transition-colors `;
+                                        
+                                        if (isBuyer || isConfirmed) {
+                                          if (isSelected) slotClassName += `bg-green-dark text-white ${isConfirmed ? "cursor-default" : "cursor-pointer"}`;
+                                          else if (isAvailable) slotClassName += `bg-[#A5C9B1] text-white ${isConfirmed ? "cursor-default" : "hover:opacity-90 cursor-pointer"}`;
+                                          else slotClassName += `text-gray-300 ${isConfirmed ? "cursor-default" : "cursor-not-allowed"}`;
+                                        } else {
+                                          if (isSellerReadOnly) {
+                                            slotClassName += "cursor-default ";
+                                            if (isSelected) slotClassName += "bg-[#A5C9B1] text-white";
+                                            else slotClassName += "text-gray-600";
+                                          } else {
+                                            slotClassName += "cursor-pointer ";
+                                            if (isSelected) slotClassName += "bg-[#A5C9B1] text-white";
+                                            else slotClassName += "hover:bg-[#D4E2D8] text-gray-600";
+                                          }
+                                        }
+
+                                        if (!isLast) {
+                                          slotClassName += isHourMark ? " border-b border-gray-400" : " border-b border-gray-300";
+                                        }
 
                                         return (
                                             <div
                                                 key={time}
                                                 onMouseDown={() => handleMouseDown(dateKey, time)}
                                                 onMouseEnter={() => handleMouseEnter(dateKey, time)}
-                                                className={`w-full h-8 flex items-center justify-center text-xs font-medium cursor-pointer transition-colors ${
-                                                    isSelected
-                                                      ? "bg-[#8EB59B] text-white" // 选中: 深一点的绿色
-                                                      : "hover:bg-[#D4E2D8] text-gray-600" // 未选中: 浅绿背景 + hover
-                                                } ${
-                                                    !isLast ? (isHourMark ? "border-b border-gray-500" : "border-b border-gray-300") : ""
-                                                }`}
+                                                className={slotClassName}
                                             >
-                                                {/* 时间文字已移至左侧轴，此处留空 */}
+                                                {/* Time text moved to left axis, leave empty here */}
                                             </div>
                                         )
                                     })}
@@ -455,7 +541,8 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                </div>
             </div>
 
-            {/* 底部按钮: Back 和 Send */}
+            {/* Bottom buttons: Back and Send */}
+            {!isSellerReadOnly && !isConfirmed && (
             <div className="flex justify-end items-center mt-6 shrink-0">
                 <button
                     onClick={handleFinalSubmit}
@@ -466,9 +553,10 @@ const SchedulePickupModal: React.FC<ScheduleTimeModalProps> = ({
                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                 >
-                    Send
+                    {isBuyer ? "Confirm" : "Send"}
                 </button>
             </div>
+            )}
           </div>
         )}
       </div>

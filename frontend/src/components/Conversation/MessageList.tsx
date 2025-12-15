@@ -13,7 +13,7 @@ const MessageList = ({ messages }: { messages: Message[] }) => {
   return (
     <div className="flex flex-col p-6">
       {messages.map((message) => (
-        <MessageItem message={message} key={message.id} />
+        <MessageItem message={message} key={message.id} allMessages={messages} />
       ))}
       <div ref={bottomRef} />
     </div>
