@@ -11,7 +11,7 @@ export const HomePageSideBar = ({
   onSearchChange,
 }: HomePageSideBarProps) => {
   return (
-    <aside className="flex flex-col gap-4">
+    <aside className="flex flex-col gap-4 sticky top-6 self-start">
       <Searchbar searchQuery={searchQuery} onSearchChange={onSearchChange} />
       <FilterHomePage />
     </aside>

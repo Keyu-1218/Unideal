@@ -3,7 +3,7 @@ import ProductList from "@/containers/ProductList";
 
 const Home = () => {
   return (
-    <main className="mt-16 pl-8 pr-8">
+    <main className="mt-16 pl-20 pr-20">
       <Container>
         <ProductList />
       </Container>

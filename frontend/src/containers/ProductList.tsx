@@ -45,7 +45,7 @@ const ProductList = () => {
   }
 
   return (
-    <div className="grid grid-cols-[minmax(625px,5fr)_minmax(250px,2fr)] gap-16 relative">
+    <div className="grid grid-cols-[1fr_290px] gap-12 relative min-w-0">
       <div className="flex-1 relative">
         {isFetching && (
           <div className="absolute inset-0 flex justify-center bg-white/60 backdrop-blur-sm z-20">
@@ -54,7 +54,7 @@ const ProductList = () => {
         )}
 
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

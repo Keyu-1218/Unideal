@@ -15,14 +15,14 @@ const Searchbar = ({
   searchQuery,
   onSearchChange,
 }: SearchbarProps) => {
-  const styles = size === "medium" ? "w-full h-14" : "w-[218px] h-12";
+  const styles = size === "medium" ? "w-[290px] h-12" : "w-[218px] h-10";
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSearchChange(e.target.value);
   };
 
   return (
-    <div className={`${styles} relative [&_button]:scale-90`}>
+    <div className={`${styles} relative [&_button]:scale-80 `}>
       <Input
         className="rounded-full h-full w-full text-lg px-6 pr-16"
         type="text"

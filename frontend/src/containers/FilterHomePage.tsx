@@ -169,28 +169,28 @@ const FilterHomePage = () => {
   const isLocationFilled = locationText.trim().length > 0;
 
   return (
-    <div className="flex flex-col gap-8 max-w-[394px] bg-background-light rounded-[10px] py-8 px-6">
+    <div className="flex flex-col gap-8 w-[290px] bg-background-light rounded-[10px] py-8 px-6">
       {/* Pick-up Date */}
       <div className="flex gap-4 items-center">
-        <Icon name="calendar" size={28} />
-        <span className="flex-1">Pickup Date</span>
+        <Icon name="calendar" size={24} />
+        <span className="flex-1 text-sm ">Pickup Date</span>
         <DatePicker
           selected={startDate}
           onChange={handleDateChange}
           placeholderText="mm/dd/yyyy"
           value={calendarValue}
           customInput={
-            <Input className="w-[160px] h-7 text-center text-xs font-semibold text-green-dark placeholder-[#719781] bg-white rounded-full px-0 py-1 border border-transparent" />
+            <Input className="!w-[100px] h-7 text-center !text-xs font-semibold text-green-dark placeholder-[#719781] bg-white rounded-full !-px-5 py-1.5 border border-transparent" />
           }
         />
       </div>
 
       {/* Your Location */}
-      <div className="flex gap-4 items-center pl-1">
-        <Icon name="location" size={18} />
-        <span className="flex-1">Your Location</span>
+      <div className="flex gap-4 items-center pl-1.5">
+        <Icon name="location" size={14} />
+        <span className="flex-1 text-sm">Your Location</span>
         <Input
-          className="w-[160px] h-7 text-xs text-black text-center placeholder-[#C7CFCA] bg-white rounded-full px-4 py-1 border border-transparent"
+          className="w-[100px] h-7 text-xs text-green-dark font-semibold text-center placeholder-[#C7CFCA] bg-white rounded-full px-4 py-1 border border-transparent"
           value={locationText}
           onChange={handleLocationInput}
           onKeyDown={handleLocationKeyDown}
@@ -200,17 +200,17 @@ const FilterHomePage = () => {
 
       {/* Have Cars? */}
       <div className={`flex gap-4 items-center pl-1 ${isLocationFilled ? "" : "opacity-50 pointer-events-none"}`}>
-        <Icon name="car" size={24} />
-        <span className="flex-1">Have Cars?</span>
+        <Icon name="car" size={20} />
+        <span className="flex-1 text-sm">Have Cars?</span>
         <button
           type="button"
           onClick={toggleHaveCar}
-          className={`relative w-[68px] h-8 rounded-full transition-all duration-400 ease-in-out ${haveCar ? "bg-green-dark" : "bg-[#EBEBEB]"}`}
+          className={`relative w-[68px] h-7 rounded-full transition-all duration-400 ease-in-out ${haveCar ? "bg-green-dark" : "bg-[#EBEBEB]"}`}
         >
           <span
-            className={`absolute top-1/2 -translate-y-1/2 w-[20px] h-[20px] rounded-full shadow-sm transition-all duration-400 ease-in-out ${haveCar ? "left-[41px] bg-white" : "left-2 bg-[#D9D9D9]"}`}
+            className={`absolute top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-full shadow-sm transition-all duration-400 ease-in-out ${haveCar ? "left-[44px] bg-white" : "left-1 bg-[#D9D9D9]"}`}
           ></span>
-          <span className={`absolute inset-0 flex items-center text-xs font-semibold transition-opacity duration-400 ${haveCar ? "justify-start pl-3 text-white" : "justify-end pr-3 text-[#5E836C]"}`}>
+          <span className={`absolute inset-0 flex items-center text-xs font-semibold transition-opacity duration-400 ${haveCar ? "justify-start pl-3.5 text-white" : "justify-end pr-4 text-[#5E836C]"}`}>
             {haveCar ? "YES" : "NO"}
           </span>
         </button>
@@ -218,14 +218,14 @@ const FilterHomePage = () => {
 
       {/* Travel Time within */}
       <div className={`flex gap-4 items-center pl-1 ${isLocationFilled ? "" : "opacity-50 pointer-events-none"}`}>
-        <Icon name="travel" size={24} />
-        <span className="flex-1">Travel Time within</span>
+        <Icon name="travel" size={20} />
+        <span className="flex-1 text-sm">Time Within</span>
         <div className="relative">
           <select
             value={travelTime}
             onChange={(e) => handleTravelTimeChange(e.target.value as any)}
             disabled={!isLocationFilled}
-            className="appearance-none w-[115px] h-8 pl-6 pr-8 text-center text-sm font-semibold text-green-dark bg-white rounded-full border border-transparent cursor-pointer"
+            className="appearance-none w-[100px] h-7 pl-3 pr-6 text-center text-xs font-semibold text-green-dark bg-white rounded-full border border-transparent cursor-pointer"
           >
             <option value="none">No limit</option>
             <option value="15">15min</option>
@@ -235,7 +235,7 @@ const FilterHomePage = () => {
           </select>
           <Icon
             name="toggle"
-            size={10}
+            size={8}
             className="rotate-180 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-green-light"
           />
           
