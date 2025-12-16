@@ -34,6 +34,7 @@ interface GetProductsParams {
   location?: string;
   haveCar?: boolean;
   travelDistance?: number;
+  includeAllProducts?: string;
 }
 
 interface CreateProductResponse {

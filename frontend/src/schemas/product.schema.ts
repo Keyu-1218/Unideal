@@ -87,7 +87,12 @@ export const AddProductSchema = z
     ...DatesStepSchema.shape, 
   })
   .refine(
-    (data) => data.availableDates.startDate < data?.availableDates?.endDate,
+    (data) => {
+      if (!data.availableDates.startDate || !data.availableDates.endDate) {
+        return true;
+      }
+      return data.availableDates.startDate < data.availableDates.endDate;
+    },
     {
       message: "End date must be after start date",
       path: ["endDate"], 

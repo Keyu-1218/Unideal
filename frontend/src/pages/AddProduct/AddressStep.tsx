@@ -12,23 +12,19 @@ const AddressStep = () => {
     const nextValue =
       id === "postalCode" ? value.replace(/\D/g, "").slice(0, 5) : value;
 
-    setAddress((prev) => {
-      const updated = { ...prev, [id]: nextValue };
-      updateData("address", updated); // keep context in sync for validation
-      return updated;
-    });
+    setAddress((prev) => ({ ...prev, [id]: nextValue }));
 
-    if (errors[`address.${id}`]) {
-      clearFieldError(`address.${id}`);
+    if (errors[`address.${id}` as keyof typeof errors]) {
+      clearFieldError(`address.${id}` as keyof typeof errors);
     }
   };
 
   useEffect(() => {
-    return () => updateData("address", address);
+    updateData("address", address);
   }, [address, updateData]);
 
   const getFieldError = (field: string) => {
-    return errors[`address.${field}`];
+    return errors[`address.${field}` as keyof typeof errors];
   };
 
   const getInputClassName = (field: string) => {
