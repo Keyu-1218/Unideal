@@ -1,9 +1,9 @@
 import { Router } from "express";
 
-import ProductService from "../services/product";
-import ConversationService from "../services/conversation";
-import ProductPhotoService from "../services/product-photo";
-import MessageService from "../services/message";
+import ProductService from "../services/product.js";
+import ConversationService from "../services/conversation.js";
+import ProductPhotoService from "../services/product-photo.js";
+import MessageService from "../services/message.js";
 
 const productRouter = Router();
 

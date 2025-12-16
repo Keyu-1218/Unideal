@@ -1,9 +1,9 @@
 import express from "express";
 import { NextFunction, Request, Response } from "express";
-import authRoutes from "./routes/auth";
-import productsRouter from "./routes/products";
+import authRoutes from "./routes/auth.js";
+import productsRouter from "./routes/products.js";
 import cors from "cors";
-import { errorHandler, httpLogger } from "./middlewares/error-handler";
+import { errorHandler, httpLogger } from "./middlewares/error-handler.js";
 
 const app = express();
 
