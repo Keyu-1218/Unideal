@@ -186,9 +186,9 @@ const FilterHomePage = () => {
       </div>
 
       {/* Your Location */}
-      <div className="flex gap-4 items-center pl-1.5">
-        <Icon name="location" size={14} />
-        <span className="flex-1 text-sm">Your Location</span>
+      <div className="flex gap-4 items-center ">
+        <Icon name="location" size={28} className="-ml-0.5" />
+        <span className="flex-1 text-sm -ml-1.5">Your Location</span>
         <Input
           className="w-[100px] h-7 text-xs text-green-dark font-normal text-center placeholder-[#C7CFCA] placeholder:text-[11px] bg-white rounded-full px-4 py-1 pb-1.5 border border-transparent"
           value={locationText}

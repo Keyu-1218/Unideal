@@ -368,7 +368,7 @@ const ProductShortDescription = () => {
                         if (!isLocationButtonDisabled) setIsLocationModalOpen(true);
                       }}
                       disabled={isLocationButtonDisabled}
-                      className={`w-full flex items-center justify-center gap-2 rounded-full font-semibold py-2 text-xs ${
+                      className={`w-full flex items-center justify-center gap-2 rounded-full font-semibold py-1.5 text-xs ${
                         isLocationButtonDisabled
                           ? "bg-[#B9CFBF] cursor-not-allowed"
                           : "bg-green-light text-green-dark cursor-pointer"
@@ -376,7 +376,7 @@ const ProductShortDescription = () => {
                     >
                       <Icon
                         name="whiteLocation"
-                        size={10}
+                        size={22}
                         className="cursor-default"
                       />
                       <p className="text-white">{locationButtonText}</p>
