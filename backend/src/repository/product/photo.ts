@@ -1,5 +1,5 @@
 import { unlink } from "node:fs/promises";
-import { sql } from '../../db';
+import { sql } from '../../db.js';
 
 interface Input {
     product_id: number;

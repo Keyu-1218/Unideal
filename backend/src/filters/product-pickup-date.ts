@@ -1,6 +1,6 @@
-import { Product } from "../repository/product/product";
+import { Product } from "../repository/product/product.js";
 
-import { sql } from "../db";
+import { sql } from "../db.js";
 
 export const filter = async (products: Product[], available_from?: string, available_to?: string): Promise<Product[]> => {
     if (!available_from && !available_to) {

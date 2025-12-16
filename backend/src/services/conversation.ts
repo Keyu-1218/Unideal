@@ -1,7 +1,7 @@
 import { Handler } from "express";
-import ProductRepository from "../repository/product/product";
-import ConversationRepository from "../repository/conversation";
-import { jwtMiddleware } from "../middlewares/jwt";
+import ProductRepository from "../repository/product/product.js";
+import ConversationRepository from "../repository/conversation.js";
+import { jwtMiddleware } from "../middlewares/jwt.js";
 
 export default class ConversationService {
     private readonly productRepository = new ProductRepository();

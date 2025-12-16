@@ -1,8 +1,8 @@
-import { issueJwt } from "../middlewares/jwt";
-import UserRepository from "../repository/users";
+import { issueJwt } from "../middlewares/jwt.js";
+import UserRepository from "../repository/users.js";
 import { z } from "zod";
-import { validateBody } from "../middlewares/data-validator";
-import { hashPassword, verifyPassword } from "../password-hasher";
+import { validateBody } from "../middlewares/data-validator.js";
+import { hashPassword, verifyPassword } from "../password-hasher.js";
 import { Handler } from "express";
 
 const RegisterSchema = z.object({

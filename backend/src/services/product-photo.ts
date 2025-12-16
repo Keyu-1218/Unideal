@@ -1,10 +1,10 @@
 import { Handler } from "express";
 
 import { z } from "zod";
-import { validateBody } from "../middlewares/data-validator";
+import { validateBody } from "../middlewares/data-validator.js";
 import multer from "multer";
 import path from "path";
-import ProductPhotoRepository from "../repository/product/photo";
+import ProductPhotoRepository from "../repository/product/photo.js";
 
 const PhotoSchema = z.object({
     product_id: z.string().regex(/^\d+$/).transform(Number),

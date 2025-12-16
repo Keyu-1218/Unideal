@@ -1,9 +1,9 @@
 import { Handler } from "express";
-import MessageRepository from "../repository/message";
-import { jwtMiddleware } from "../middlewares/jwt";
-import { validateBody } from "../middlewares/data-validator";
-import ConversationRepository from "../repository/conversation";
-import ProductRepository from "../repository/product/product";
+import MessageRepository from "../repository/message.js";
+import { jwtMiddleware } from "../middlewares/jwt.js";
+import { validateBody } from "../middlewares/data-validator.js";
+import ConversationRepository from "../repository/conversation.js";
+import ProductRepository from "../repository/product/product.js";
 
 
 export default class MessageService {

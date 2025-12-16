@@ -1,15 +1,15 @@
-import { jwtMiddleware } from "../middlewares/jwt";
-import { validateBody } from "../middlewares/data-validator";
+import { jwtMiddleware } from "../middlewares/jwt.js";
+import { validateBody } from "../middlewares/data-validator.js";
 
-import ComplexProductRepository, { AddProductInput } from "../repository/product/composite";
-import ProductRepository from "../repository/product/product";
+import ComplexProductRepository, { AddProductInput } from "../repository/product/composite.js";
+import ProductRepository from "../repository/product/product.js";
 
 import { Handler } from "express";
 
-import { filter as filterByPickupDate } from "../filters/product-pickup-date";
-import { filter as filterByPickupAddress } from "../filters/product-pickup-address";
-import { filter as filterByOwned } from "../filters/product-owned";
-import { sql } from "../db";
+import { filter as filterByPickupDate } from "../filters/product-pickup-date.js";
+import { filter as filterByPickupAddress } from "../filters/product-pickup-address.js";
+import { filter as filterByOwned } from "../filters/product-owned.js";
+import { sql } from "../db.js";
 
 export default class ProductService {
     private readonly productRepository = new ProductRepository();

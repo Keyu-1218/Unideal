@@ -1,4 +1,4 @@
-import ProductRepository, { Product } from "../repository/product/product";
+import ProductRepository, { Product } from "../repository/product/product.js";
 
 export const filter = async (products: Product[], sellerId?: number): Promise<Product[]> => {
     if (!sellerId) {

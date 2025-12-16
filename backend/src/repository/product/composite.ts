@@ -1,10 +1,10 @@
-import ProductRepository, { Product } from "./product";
-import ProductPickupDateRepository from "./pickup-date";
-import ProductPickupAddressRepository from "./pickup-address";
-import ProductPhotoRepository from "./photo";
+import ProductRepository, { Product } from "./product.js";
+import ProductPickupDateRepository from "./pickup-date.js";
+import ProductPickupAddressRepository from "./pickup-address.js";
+import ProductPhotoRepository from "./photo.js";
 
 import { z } from "zod";
-import { sql } from "../../db";
+import { sql } from "../../db.js";
 
 const productRepository = new ProductRepository();
 const productPickupDateRepository = new ProductPickupDateRepository();

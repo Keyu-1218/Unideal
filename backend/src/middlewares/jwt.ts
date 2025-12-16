@@ -1,6 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { User } from "../repository/users";
+import { User } from "../repository/users.js";
 
 declare global {
   namespace Express {

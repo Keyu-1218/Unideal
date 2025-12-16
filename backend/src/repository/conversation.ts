@@ -1,6 +1,6 @@
-import { sql } from "../db";
+import { sql } from "../db.js";
 import { z } from "zod";
-import { Product } from "./product/product";
+import { Product } from "./product/product.js";
 
 const Schema = z.object({
     product: z.number(),

@@ -1,7 +1,7 @@
-import { Product } from "../repository/product/product";
-import { sql } from "../db";
-import { ProductPickupAddress } from "../repository/product/pickup-address";
-import { DistanceMatrixLocation, getDistanceMatrix } from "../externalAPI/google-maps";
+import { Product } from "../repository/product/product.js";
+import { sql } from "../db.js";
+import { ProductPickupAddress } from "../repository/product/pickup-address.js";
+import { DistanceMatrixLocation, getDistanceMatrix } from "../externalAPI/google-maps.js";
 
 export const filter = async (products: Product[], location?: string, haveCar: boolean = true, travelDistance?: number): Promise<Product[]> => {
     if (!location || !travelDistance) {

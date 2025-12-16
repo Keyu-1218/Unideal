@@ -1,4 +1,4 @@
-import { sql } from '../../db';
+import { sql } from '../../db.js';
 import { z } from 'zod';
 
 const transformDate = (date: Date): string => {
