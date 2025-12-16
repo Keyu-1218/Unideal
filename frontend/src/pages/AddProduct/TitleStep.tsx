@@ -23,17 +23,16 @@ const TitleStep = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[500px]">
-      <div className="w-[612px]">
-        <h2 className="text-[35px] font-bold">
+    <div className="w-[clamp(520px,56vw,680px)]">
+        <h2 className="text-[30px] font-bold">
           Give your item a short, catchy title
         </h2>
-        <p className="text-[22px] text-text-gray text-left mt-2">
+        <p className="text-[18px] text-text-gray text-left mt-2">
           Keep it short, clear, and easy to understand.
         </p>
 
         <textarea
-          className={`w-full h-[212px] border-2 rounded-[10px] mt-7 p-3.5 resize-none transition-all duration-200
+          className={`w-full h-[clamp(140px, 30vh, 220px)] border-2 rounded-[10px] mt-[clamp(16px,6vh,40px)] p-3.5 resize-none transition-all duration-200
             ${
               error 
                 ? "border-red-500 focus:border-red-500  "
@@ -45,7 +44,7 @@ const TitleStep = () => {
           placeholder="e.g., Vintage Leather Sofa"
         />
 
-        <div className="flex justify-between items-center px-2">
+        <div className="flex justify-between items-center px-2 mt-[clamp(4px,2vh,8px)]">
           {error ? (
             <div className="flex items-center gap-2 text-red-500">
               <AlertCircle size={18} />
@@ -55,12 +54,11 @@ const TitleStep = () => {
             <div />
           )}
 
-          <span className="text-gray-dark text-[15px] font-bold">
+          <span className="text-gray-dark text-[12px] font-semibold">
             {input.length}/30
           </span>
         </div>
       </div>
-    </div>
   );
 };
 

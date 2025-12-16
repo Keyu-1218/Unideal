@@ -22,38 +22,27 @@ const PriceStep = () => {
   }, [price, updateData]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[500px]">
-      <div className="text-center">
-        <h2 className="text-[35px] font-bold mb-16">Now, set a price</h2>
+    <div className="w-[clamp(520px,56vw,680px)] mx-auto flex flex-col items-center text-center">
+      <h2 className="text-[34px] font-bold ">Now, set a price</h2>
 
-        <div className="flex items-center justify-center">
-          <input
-            type="text"
-            value={price}
-            onChange={handleChange}
-            placeholder="25€"
-            maxLength={4}
-            className="
-              w-[250px]
-              text-[110px]
-              font-bold
-              text-center
-              bg-transparent
-              border-gray-300
-              focus:border-green-dark
-              outline-none
-              placeholder:text-gray-300
-            "
-          />
-          {price.length !== 0 && (
-            <span className="text-[110px] font-bold ml-1">€</span>
-          )}
-        </div>
+      <div className="flex items-center justify-center mt-[clamp(16px,6vh,40px)]">
+        <input
+          type="text"
+          value={price}
+          onChange={handleChange}
+          placeholder="25"
+          maxLength={4}
+          inputMode="numeric"
+          pattern="[0-9]*"
+          className="w-[clamp(150px,24vw,160px)] text-[clamp(48px,8vw,72px)] font-bold text-center bg-transparent focus:border-green-dark outline-none placeholder:text-gray-300"
+        />
+        <span className="text-[clamp(48px,8vw,72px)] font-bold">€</span>
       </div>
+
       {error && (
-        <div className="flex items-center gap-2 mt-6 text-red-500 animate-slideDown">
-          <AlertCircle size={24} />
-          <span className="text-lg font-medium">{error}</span>
+        <div className="flex items-center gap-2 mt-[clamp(8px,3vh,16px)] text-red-500 animate-slideDown">
+          <AlertCircle size={20} />
+          <span className="text-sm font-medium">{error}</span>
         </div>
       )}
     </div>

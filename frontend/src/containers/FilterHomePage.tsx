@@ -190,7 +190,7 @@ const FilterHomePage = () => {
         <Icon name="location" size={14} />
         <span className="flex-1 text-sm">Your Location</span>
         <Input
-          className="w-[100px] h-7 text-xs text-green-dark font-semibold text-center placeholder-[#C7CFCA] bg-white rounded-full px-4 py-1 border border-transparent"
+          className="w-[100px] h-7 text-xs text-green-dark font-normal text-center placeholder-[#C7CFCA] placeholder:text-[11px] bg-white rounded-full px-4 py-1 pb-1.5 border border-transparent"
           value={locationText}
           onChange={handleLocationInput}
           onKeyDown={handleLocationKeyDown}

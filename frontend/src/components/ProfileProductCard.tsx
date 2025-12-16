@@ -10,9 +10,9 @@ const ProfileProductCard = ({ product }: { product: Product }) => {
     : PLACEHOLDER_IMAGE_URL;
 
   return (
-    <div className="w-[180px] flex flex-col gap-[9px]  transition-all duration-300 ease-in-out hover:scale-105 hover:rounded-2xl hover:cursor-pointer">
+    <div className="w-[140px] flex flex-col gap-[9px]  transition-all duration-300 ease-in-out hover:scale-105 hover:rounded-2xl hover:cursor-pointer">
       <Link to={`/product/${product.id}`}>
-        <div className="w-full h-[180px] relative rounded-2xl overflow-hidden">
+        <div className="w-full h-[140px] relative rounded-2xl overflow-hidden">
           <img
             src={imageUrl}
             alt={`${product.title} photo`}

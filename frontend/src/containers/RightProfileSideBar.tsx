@@ -26,7 +26,7 @@ const RightProfileSideBar = ({
   };
 
   return (
-    <aside className="p-11">
+    <aside className="p-11" style={{ paddingRight: "max(3rem, calc((100vw - 1400px) / 2))" }}>
       <div className="flex flex-col items-center gap-6">
         <Searchbar
           size="small"
@@ -35,7 +35,7 @@ const RightProfileSideBar = ({
           onSearchChange={onSearchChange}
         />
 
-        <div className="w-[218px] h-[143px] bg-background-light rounded-xs">
+        <div className="w-[218px] h-[143px] bg-background-light rounded-sm">
           <div className="flex flex-col items-start justify-center min-h-[143px] gap-4 px-4">
             {/* Ongoing */}
             <div className="flex gap-2.5 items-center">
@@ -43,12 +43,12 @@ const RightProfileSideBar = ({
                 id="ongoing"
                 type="checkbox"
                 checked={searchParams.get("ongoing") === "true"}
-                className="w-5 h-5 rounded accent-green-dark cursor-pointer"
+                className="w-4 h-4 rounded accent-green-dark cursor-pointer"
                 onChange={handleInputChange}
               />
               <label
                 htmlFor="ongoing"
-                className="text-sm font-medium cursor-pointer"
+                className="text-xs font-medium cursor-pointer"
               >
                 Ongoing
               </label>
@@ -60,12 +60,12 @@ const RightProfileSideBar = ({
                 id="undibed"
                 type="checkbox"
                 checked={searchParams.get("undibed") === "true"}
-                className="w-5 h-5 rounded accent-green-dark cursor-pointer"
+                className="w-4 h-4 rounded accent-green-dark cursor-pointer"
                 onChange={handleInputChange}
               />
               <label
                 htmlFor="undibed"
-                className="text-sm font-medium cursor-pointer"
+                className="text-xs font-medium cursor-pointer"
               >
                 Undibed
               </label>
@@ -77,12 +77,12 @@ const RightProfileSideBar = ({
                 id="sold"
                 type="checkbox"
                 checked={searchParams.get("sold") === "true"}
-                className="w-5 h-5 rounded accent-green-dark cursor-pointer"
+                className="w-4 h-4 rounded accent-green-dark cursor-pointer"
                 onChange={handleInputChange}
               />
               <label
                 htmlFor="sold"
-                className="text-sm font-medium cursor-pointer"
+                className="text-xs font-medium cursor-pointer"
               >
                 Sold
               </label>

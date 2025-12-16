@@ -5,6 +5,7 @@ type UserAvatarProps = {
 };
 
 const sizeClasses = {
+  pr: "w-12 h-12 text-lg",
   sm: "w-10 h-10 text-sm", // 40px
   md: "w-14 h-14 text-2xl", // 56px
   lg: "w-20 h-20 text-3xl", // 80px

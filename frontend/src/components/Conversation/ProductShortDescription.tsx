@@ -44,7 +44,7 @@ const ProductShortDescription = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
 
   const { data: productsData, isLoading: isProductsLoading } =
-    useGetProductsQuery();
+    useGetProductsQuery({ includeAllProducts: 'true' });
   const currentUserId = useSelector(
     (state: RootState) => state.auth.user?.id ?? null
   );

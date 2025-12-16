@@ -26,8 +26,20 @@ const ConversationListItem = ({
         m.content.startsWith("PICKUP_CONFIRMED::")
     );
 
-  const isConfirmed = latestRelevantMessage?.content.startsWith("PICKUP_CONFIRMED::");
-  const completedCount = isConfirmed ? 1 : 0;
+  const confirmedTimeStr = latestRelevantMessage?.content.startsWith("PICKUP_CONFIRMED::")
+    ? latestRelevantMessage.content.replace("PICKUP_CONFIRMED::", "")
+    : null;
+
+  const locationMessage = messages
+    ?.slice()
+    .reverse()
+    .find((m) => m.content.startsWith("You can pick up at "));
+
+  const pickupLocationStr = locationMessage
+    ? locationMessage.content.replace("You can pick up at ", "").replace(/\.$/, "")
+    : null;
+
+  const completedCount = (confirmedTimeStr ? 1 : 0) + (pickupLocationStr ? 1 : 0);
   const totalCount = conversation.is_buyer ? 4 : 3;
 
   const otherUser = (conversation.is_buyer ? conversation.seller : conversation.buyer) as any;

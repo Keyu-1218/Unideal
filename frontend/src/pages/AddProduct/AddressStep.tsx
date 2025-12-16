@@ -8,7 +8,15 @@ const AddressStep = () => {
 
   const handleAddressChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setAddress((prev) => ({ ...prev, [id]: value }));
+    // Sanitize postal code: keep digits only, max length 5
+    const nextValue =
+      id === "postalCode" ? value.replace(/\D/g, "").slice(0, 5) : value;
+
+    setAddress((prev) => {
+      const updated = { ...prev, [id]: nextValue };
+      updateData("address", updated); // keep context in sync for validation
+      return updated;
+    });
 
     if (errors[`address.${id}`]) {
       clearFieldError(`address.${id}`);
@@ -25,7 +33,7 @@ const AddressStep = () => {
 
   const getInputClassName = (field: string) => {
     const hasError = getFieldError(field);
-    return `w-full h-[65px] pl-4 border-2 rounded-[8px] text-[21px] placeholder:text-gray-dark transition-colors
+    return `w-full h-[48px] pl-4 border-2 rounded-[10px] text-[16px] placeholder:text-gray-dark transition-colors
       ${
         hasError
           ? "border-red-500 focus:border-red-500 "
@@ -34,15 +42,14 @@ const AddressStep = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[500px] py-12">
-      <div className="w-[714px]">
-        <h2 className="text-[35px] font-bold">Pick up address</h2>
-        <p className="text-[22px] text-text-gray text-left mt-2">
+    <div className="w-[clamp(520px,56vw,680px)]">
+        <h2 className="text-[30px] font-bold">Pick up address</h2>
+        <p className="text-[18px] text-text-gray text-left">
           Your address is only shared with guests after they've made a
           reservation.
         </p>
 
-        <div className="mt-10 space-y-6">
+        <div className="mt-4 space-y-4">
           {/* Country */}
           <div>
             <label
@@ -132,6 +139,8 @@ const AddressStep = () => {
               className={getInputClassName("postalCode")}
               value={address.postalCode}
               onChange={handleAddressChange}
+              inputMode="numeric"
+              pattern="[0-9]*"
               maxLength={5}
             />
             {getFieldError("postalCode") && (
@@ -142,7 +151,6 @@ const AddressStep = () => {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 };

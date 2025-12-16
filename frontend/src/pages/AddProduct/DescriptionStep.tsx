@@ -21,17 +21,16 @@ const DescriptionStep = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[500px]">
-      <div className="w-[612px]">
-        <h2 className="text-[35px] font-bold">Create your description</h2>
-        <p className="text-[22px] text-text-gray text-left mt-2">
+    <div className="w-[clamp(520px,56vw,680px)]">
+        <h2 className="text-[30px] font-bold">Create your description</h2>
+        <p className="text-[18px] text-text-gray text-left mt-2">
           Describe what makes your item special.
         </p>
 
         <textarea
-          className={`w-full h-[212px] border-2 rounded-[10px] mt-7 p-3.5 resize-none transition-all duration-200
+          className={`w-full h-[180px] border-2 rounded-[10px] mt-[clamp(16px,6vh,40px)] p-3.5 resize-none transition-all duration-200
             ${
-              error // ✅ Замість true використовуй error
+              error 
                 ? "border-red-500 focus:border-red-500  "
                 : "border-gray-dark focus:border-green-dark "
             }`}
@@ -41,7 +40,7 @@ const DescriptionStep = () => {
           placeholder="Describe your item..."
         />
 
-        <div className="flex justify-between items-center px-2 ">
+        <div className="flex justify-between items-center px-2 mt-[clamp(4px,2vh,8px)]">
           {error ? (
             <div className="flex items-center gap-2 text-red-500">
               <AlertCircle size={18} />
@@ -51,12 +50,11 @@ const DescriptionStep = () => {
             <div />
           )}
 
-          <span className="text-gray-dark text-[15px] font-bold">
+          <span className="text-gray-dark text-[12px] font-semibold">
             {description.length}/200
           </span>
         </div>
       </div>
-    </div>
   );
 };
 

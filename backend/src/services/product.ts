@@ -64,8 +64,8 @@ export default class ProductService {
             query.owned === 'true' ? sellerId : undefined,
         );
 
-        // Filter out own products and dibsed products from homepage
-        if (query.owned !== 'true') {
+        // Filter out own products and dibsed products from homepage (unless includeAllProducts is true)
+        if (query.owned !== 'true' && query.includeAllProducts !== 'true') {
             try {
                 // Get all product IDs that have been dibsed (have conversations)
                 const dibsedProducts = await sql`

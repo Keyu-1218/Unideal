@@ -28,9 +28,9 @@ export const PhotoStepSchema = z.object({
     .refine(
       (files) =>
         files.every((file) =>
-          ["image/jpeg", "image/png", "image/webp"].includes(file.type)
+          ["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)
         ),
-      "Only JPEG, PNG, and WEBP images are allowed"
+      "Only JPEG, PNG, WEBP, and AVIF images are allowed"
     ),
 });
 
@@ -46,7 +46,6 @@ export const AddressStepSchema = z.object({
     country: z.string().min(1, " Country is required"),
     city: z.string().min(1, "City is required"),
     streetAddress: z.string().min(1, "Street address is required"),
-    postalCode: z.string().regex(/^\d{5}$/, "Postal code must be 5 digits."),
   }),
 });
 

@@ -8,13 +8,13 @@ const Navbar = () => {
       <Container>
         <nav className="flex justify-between mt-2 mb-2 items-center">
           <div className="flex gap-1.5 hover: cursor-pointer">
-            <Icon name="logo" />
+            <Icon name="logo" size={26} />
             <a href="/">
               <div>
-                <span className="text-green-dark font-logo text-[30px] font-bold leading-normal">
+                <span className="text-green-dark font-logo text-[26px] font-bold leading-normal">
                   uni
                 </span>
-                <span className="text-green-light font-logo text-[30px] font-bold leading-normal">
+                <span className="text-green-light font-logo text-[26px] font-bold leading-normal">
                   deal
                 </span>
               </div>

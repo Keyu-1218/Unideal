@@ -58,16 +58,20 @@ const PhotoStep = () => {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[500px]">
-      <div className="w-[1100px]">
-        <div className="flex justify-between items-center mb-11">
-          <h2 className="text-[35px] font-bold">How does it look like?</h2>
+    <div className="w-[clamp(520px,56vw,680px)]">
+      <div className="flex items-start justify-between mb-[clamp(12px,3vh,20px)]">
+        <div>
+          <h2 className="text-[30px] font-bold">How does it look like?</h2>
+          <p className="text-[18px] text-text-gray">Add up to 5 photos.</p>
+        </div>
+        <div>
           <button
-            className="text-7xl rounded-full h-24 w-24 bg-background-gray text-green-dark hover:cursor-pointer flex items-center justify-center leading-none"
+            className="rounded-full h-12 w-12 bg-background-gray text-green-dark hover:cursor-pointer flex items-center justify-center shadow-sm"
             onClick={() => inputRef.current?.click()}
             aria-label="Add photos"
+            title="Add photos"
           >
-            <Plus size={48} />
+            <Plus size={28} />
           </button>
           <input
             type="file"
@@ -75,22 +79,16 @@ const PhotoStep = () => {
             className="hidden"
             onChange={handleFileChange}
             multiple
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/png,image/webp,image/avif"
           />
         </div>
+      </div>
 
-        {error && (
-          <div className="flex items-center gap-2 mb-6 p-4 bg-red-50 border-2 border-red-500 rounded-lg text-red-600 animate-slideDown">
-            <AlertCircle size={24} />
-            <span className="text-base font-medium">{error}</span>
-          </div>
-        )}
-
-        <div className="grid grid-cols-3 gap-4 auto-rows-[240px]">
-          <div
-            className="bg-gray-200 rounded-lg border-2 border-dashed border-gray-400 flex items-center justify-center 
-               row-span-2 relative group"
-          >
+      <div className="grid grid-cols-3 gap-3 auto-rows-[clamp(120px,22vh,200px)]">
+        <div
+          className="bg-gray-100 rounded-lg border border-dashed border-gray-400 flex items-center justify-center 
+             row-span-2 relative group"
+        >
             {totalSlots[0] ? (
               <>
                 <img
@@ -100,44 +98,50 @@ const PhotoStep = () => {
                 />
                 <button
                   onClick={() => handleFileDelete(totalSlots[0].id)}
-                  className="absolute top-2 right-2 rounded-full bg-red-600 text-white hover:cursor-pointer opacity-0 group-hover:opacity-100  hover:scale-110 transition-all"
+                  className="absolute top-2 right-2 rounded-full bg-red-600 text-white hover:cursor-pointer opacity-0 group-hover:opacity-100 hover:scale-110 transition-all p-1"
                 >
                   <X />
                 </button>
               </>
             ) : (
-              <span className="text-gray-500 font-semibold">Cover Photo</span>
+              <span className="text-gray-400 font-semibold text-sm">Cover Photo</span>
+            )}
+        </div>
+
+        {totalSlots.slice(1).map((img, i) => (
+          <div
+            key={i}
+            className="bg-gray-100 rounded-lg border border-dashed border-gray-400 flex items-center justify-center relative group"
+          >
+            {img ? (
+              <>
+                <img
+                  src={img.preview}
+                  alt={`Photo ${i + 2}`}
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                <button
+                  onClick={() => handleFileDelete(img.id)}
+                  className="absolute top-2 right-2 rounded-full bg-red-600 text-white hover:cursor-pointer opacity-0 group-hover:opacity-100 hover:scale-110 transition-all p-1"
+                >
+                  <X />
+                </button>
+              </>
+            ) : (
+              <span className="text-gray-400 font-semibold text-sm">
+                Photo {i + 2}
+              </span>
             )}
           </div>
-
-          {totalSlots.slice(1).map((img, i) => (
-            <div
-              key={i}
-              className="bg-gray-200 rounded-lg border-2 border-dashed border-gray-400 flex items-center justify-center relative group"
-            >
-              {img ? (
-                <>
-                  <img
-                    src={img.preview}
-                    alt={`Photo ${i + 2}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => handleFileDelete(img.id)}
-                    className="absolute top-2 right-2 rounded-full bg-red-600 text-white hover:cursor-pointer opacity-0 group-hover:opacity-100  hover:scale-110 transition-all"
-                  >
-                    <X />
-                  </button>
-                </>
-              ) : (
-                <span className="text-gray-500 font-semibold">
-                  Photo {i + 2}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
+
+      {error && (
+        <div className="flex items-center gap-2 mt-4 p-3 bg-red-50 border border-red-500 rounded-md text-red-600 animate-slideDown">
+          <AlertCircle size={20} />
+          <span className="text-sm font-medium">{error}</span>
+        </div>
+      )}
     </div>
   );
 };
