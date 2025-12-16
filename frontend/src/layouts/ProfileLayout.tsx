@@ -9,9 +9,11 @@ const ProfileLayout = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const userEmail: string = user?.email ?? "";
+
   return (
     <div className="flex">
-      <LeftProfileSideBar userEmail={user?.email} />
+      <LeftProfileSideBar userEmail={userEmail} />
       <Outlet context={{ searchQuery }} />
       <RightProfileSideBar
         searchQuery={searchQuery}

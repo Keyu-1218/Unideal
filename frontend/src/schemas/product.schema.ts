@@ -46,6 +46,10 @@ export const AddressStepSchema = z.object({
     country: z.string().min(1, " Country is required"),
     city: z.string().min(1, "City is required"),
     streetAddress: z.string().min(1, "Street address is required"),
+    postalCode: z.preprocess(
+      (val) => (typeof val === "string" ? val.replace(/\D/g, "").slice(0, 5) : val),
+      z.string().trim().length(5, "Postal code must be exactly 5 digits").regex(/^\d{5}$/, "Postal code must contain only digits")
+    ),
   }),
 });
 

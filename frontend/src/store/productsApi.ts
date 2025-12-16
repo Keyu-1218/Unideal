@@ -42,18 +42,21 @@ interface CreateProductResponse {
   id: number;
 }
 
+// Create a separate baseQuery instance for reuse in queryFn
+const customBaseQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_BASE_DEV_URL || "http://localhost:5000",
+  prepareHeaders: (headers, { getState }) => {
+    const token = (getState() as RootState).auth.token;
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
 export const productsApi = createApi({
   reducerPath: "productsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_DEV_URL || "http://localhost:5000",
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: customBaseQuery,
   tagTypes: ["Products"],
   endpoints: (builder) => ({
     getProducts: builder.query<ProductsResponse, GetProductsParams | void>({
@@ -80,17 +83,19 @@ export const productsApi = createApi({
     >({
       queryFn: async (
         { productData, photos },
-        api,
-        extraOptions,
-        baseQuery
+        api
       ) => {
         try {
           // STEP 1: POST /products
-          const productResult = await baseQuery({
-            url: "/products",
-            method: "POST",
-            body: productData,
-          });
+          const productResult = await customBaseQuery(
+            {
+              url: "/products",
+              method: "POST",
+              body: productData,
+            },
+            api,
+            {}
+          );
 
           if (productResult.error) {
             return { error: productResult.error };
@@ -105,11 +110,15 @@ export const productsApi = createApi({
               formData.append("files", file, file.name);
             });
 
-            const photoResult = await baseQuery({
-              url: "products/photos/",
-              method: "POST",
-              body: formData,
-            });
+            const photoResult = await customBaseQuery(
+              {
+                url: "products/photos/",
+                method: "POST",
+                body: formData,
+              },
+              api,
+              {}
+            );
 
             if (photoResult.error) {
               return { error: photoResult.error };

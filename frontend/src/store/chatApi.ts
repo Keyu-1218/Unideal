@@ -65,7 +65,7 @@ export const chatApi = createApi({
       query: (conversationId) =>
         `/products/conversations/${conversationId}/messages`,
       transformResponse: (response: GetMessagesResponse) => response.messages,
-      providesTags: (result, error, conversationId) => [
+      providesTags: (_result, _error, conversationId) => [
         { type: "Messages", id: conversationId },
       ],
     }),
@@ -109,7 +109,7 @@ export const chatApi = createApi({
           patchResult.undo();
         }
       },
-      invalidatesTags: (result, error, { conversationId }) => [
+      invalidatesTags: (_result, _error, { conversationId }) => [
         { type: "Messages", id: conversationId },
       ],
     }),

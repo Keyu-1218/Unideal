@@ -4,10 +4,7 @@ import { toast } from "sonner";
 import Icon from "../Icon";
 
 const MessageInput = ({ conversationId }: { conversationId: number }) => {
-  const [
-    sendMessage,
-    { isLoading: isSendingMessage, error: sendMessageError },
-  ] = useSendMessageMutation();
+  const [sendMessage, { isLoading: isSendingMessage }] = useSendMessageMutation();
   const [input, setInput] = useState("");
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
