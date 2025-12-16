@@ -62,50 +62,49 @@ const ProductInfoCard = ({ product }: { product: Product }) => {
   };
 
   return (
-    <div className="w-[631px]">
-      <div className="flex justify-between items-center mb-6">
-        <span className="text-green-dark text-5xl font-bold">
+    <div className="w-[clamp(480px,38vw,560px)]">
+      <div className="flex justify-between items-center mb-3">
+        <span className="text-green-dark font-bold text-[clamp(28px,2.6vw,36px)]">
           {product.price} €
         </span>
       </div>
       <div>
-        <h3 className="text-3xl font-bold mb-4">{product.title}</h3>
-        <p className="text-gray-dark text-[14px] leading-6">
+        <h3 className="font-bold mb-2 text-[clamp(18px,2.2vw,24px)]">{product.title}</h3>
+        <p className="text-gray-dark leading-6 text-[clamp(12px,1.4vw,13px)]">
           {product.short_description}
         </p>
-        <div className="mt-6 flex gap-5">
-          <div className="flex items-center gap-3.5 rounded-4xl bg-background-light px-5 py-3">
+        <div className="mt-5 flex gap-5">
+          <div className="flex items-center gap-3.5 rounded-4xl bg-background-light px-4 py-2">
             <Icon name="size" size={21} />
-            <span className="text-green-light">Size:</span>
-            <span className="text-green-dark font-bold">
+            <span className="text-green-light text-[clamp(9px,1.4vw,11px)]">Size:</span>
+            <span className="text-green-dark font-bold text-[clamp(10px,1.6vw,12px)]">
               120cm x 50cm x 40cm
             </span>
           </div>
-          <div className="flex items-center gap-3.5 rounded-4xl bg-background-light px-5 py-3">
+          <div className="flex items-center gap-3.5 rounded-4xl bg-background-light px-4 py-2">
             <Icon name="condition" size={21} />
-            <span className="text-green-light">Condition:</span>
-            <span className="text-green-dark font-bold">80% New</span>
+            <span className="text-green-light text-[clamp(9px,1.4vw,11px)]">Condition:</span>
+            <span className="text-green-dark font-bold text-[clamp(10px,1.6vw,12px)]">80% New</span>
           </div>
         </div>
-        <div className="h-px bg-gray-light mt-11" />
+        <div className="h-px bg-gray-light mt-6" />
       </div>
 
       <div>
-        <div className="mt-7 rounded-2xl flex justify-between items-center bg-background-light py-3 pr-11 pl-7">
-          <div className="flex gap-6">
-            <Icon name="date" size={31} />
-            <span className="text-green-light">
-              Available
-              <br /> Pickup Dates
+        <div className="mt-6 rounded-2xl flex justify-between items-center bg-background-light py-3 pr-12 pl-5">
+          <div className="flex items-center gap-2.5">
+            <Icon name="date" size={24} />
+            <span className="text-green-light text-[clamp(9px,1.5vw,11px)] pr-1">
+              Available Pickup Dates
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-green-light">From</span>
-            <span className="text-green-dark font-semibold text-[22px]">
+            <span className="text-green-light text-[clamp(9px,1.4vw,11px)]">From</span>
+            <span className="text-green-dark font-bold text-[clamp(11px,1.8vw,13px)]">
               {product.pickup.date.available_from}
             </span>
-            <span className="text-green-light">To</span>
-            <span className="text-green-dark font-semibold text-[22px]">
+            <span className="text-green-light text-[clamp(9px,1.4vw,11px)]">To</span>
+            <span className="text-green-dark font-bold text-[clamp(11px,1.8vw,13px)]">
               {product.pickup.date.available_to}
             </span>
           </div>
@@ -117,7 +116,7 @@ const ProductInfoCard = ({ product }: { product: Product }) => {
         />
         <Button
           disabled={isLoading || isSendingInitialMessage || isOwnProduct}
-          className="w-full text-xl font-normal bg-green-dark hover:bg-green-dark hover:opacity-90 py-6 mt-8 hover:cursor-pointer"
+          className="w-full font-normal bg-green-dark hover:bg-green-dark hover:opacity-90 py-6 mt-8 hover:cursor-pointer text-[clamp(14px,1.8vw,16px)]"
           onClick={handleDibsClick}
         >
           {isOwnProduct

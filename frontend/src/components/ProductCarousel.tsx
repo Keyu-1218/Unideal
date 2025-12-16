@@ -18,20 +18,20 @@ export function ProductCarousel({ photos }: { photos: string[] }) {
   }
 
   return (
-    <div className="relative w-[618px] h-[675px] rounded-lg bg-background-light flex items-center justify-center overflow-hidden">
-      <Carousel className="w-full h-full">
-        <CarouselContent className="h-full ">
+    <div className="relative w-full h-full flex items-center">
+      <Carousel className="w-full ">
+        <CarouselContent>
           {photos.map((photo, index) => (
             <CarouselItem
               key={photo}
               className="flex items-center justify-center"
             >
-              <Card className="bg-transparent border-none shadow-none h-full">
-                <CardContent className="flex items-center justify-center p-0 h-full">
+              <Card className="bg-transparent border-none shadow-none h-full flex items-center">
+                <CardContent className="flex items-center justify-center p-0 w-full">
                   <img
                     src={`${PHOTO_DOWNLOAD_URL}/${photo}`}
                     alt={`Product image ${index}`}
-                    className="w-[464px] h-[618px] object-contain rounded-lg"
+                    className="object-contain rounded-lg px-12  max-h-[600px]"
                   />
                 </CardContent>
               </Card>

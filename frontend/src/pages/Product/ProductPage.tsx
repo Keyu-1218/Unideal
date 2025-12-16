@@ -31,12 +31,14 @@ export const ProductPage = () => {
 
   return (
     <Container>
-      <main className="mt-16 px-8">
-        <div className="flex justify-between gap-16">
-          <div className="max-w-[618px]">
+      <main className="mt-10 pl-20 pr-20 mb-16">
+        <div className="flex items-stretch gap-[clamp(16px,5vw,60px)]">
+          <div className="flex-1 w-[clamp(420px,40vw,520px)] bg-background-light rounded-lg flex items-center justify-center py-6">
             <ProductCarousel photos={photos} />
           </div>
-          <ProductInfoCard product={product} />
+          <div className="flex-shrink-0">
+            <ProductInfoCard product={product} />
+          </div>
         </div>
       </main>
     </Container>

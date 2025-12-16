@@ -4,9 +4,9 @@ import Container from "./Сontainer";
 
 const Navbar = () => {
   return (
-    <div className="px-8">
+    <div className="px-16">
       <Container>
-        <nav className="flex justify-between mt-3 mb-4 items-center">
+        <nav className="flex justify-between mt-2 mb-2 items-center">
           <div className="flex gap-1.5 hover: cursor-pointer">
             <Icon name="logo" />
             <a href="/">
@@ -22,10 +22,10 @@ const Navbar = () => {
           </div>
           <div className="flex gap-5 ">
             <Link to={"/chat"}>
-              <Icon name="message" />
+              <Icon name="message" size={26} />
             </Link>
             <Link to={"/profile"}>
-              <Icon name="profile" />
+              <Icon name="profile" size={26} />
             </Link>
           </div>
         </nav>
