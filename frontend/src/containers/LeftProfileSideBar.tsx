@@ -14,9 +14,9 @@ const LeftProfileSideBar = ({ userEmail }: { userEmail: string }) => {
       className="flex flex-col gap-9 h-screen border-r-1 border-gray-light py-6 pr-4"
       style={{ paddingLeft: "max(3.5rem, calc((100vw - 1400px) / 2))" }}
     >
-      <div className="flex gap-4 items-center">
-        <UserAvatar label={userEmail} size="lg"/>
-        <span className="font-bold text-xl">{name}</span>
+      <div className="flex gap-4 items-center pl-2">
+        <UserAvatar label={userEmail} size="xs"/>
+        <span className="font-semibold text-lg">{name}</span>
       </div>
       <div>
         <div

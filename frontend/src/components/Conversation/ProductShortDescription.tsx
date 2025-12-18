@@ -467,6 +467,17 @@ const ProductShortDescription = () => {
           </div>
         )}
 
+        {!isBuyer && (
+          <div className="mt-6 flex justify-center">
+            <Button
+              variant="outline"
+              className="border-green-dark text-gray-dark font-semibold px-8 py-5 rounded-4xl"
+            >
+              Undibs
+            </Button>
+          </div>
+        )}
+
         {/* Location Modal (Seller triggers) */}
         <ScheduleLocationModal
           isOpen={isLocationModalOpen}

@@ -1,11 +1,11 @@
 type UserAvatarProps = {
   label?: string;
   className?: string;
-  size?: "sm" | "md" | "lg"; 
+  size?: "sm" | "md" | "lg" |"xs"; 
 };
 
 const sizeClasses = {
-  pr: "w-12 h-12 text-lg",
+  xs: "w-12 h-12 text-md", // 32px
   sm: "w-10 h-10 text-sm", // 40px
   md: "w-14 h-14 text-2xl", // 56px
   lg: "w-20 h-20 text-3xl", // 80px
