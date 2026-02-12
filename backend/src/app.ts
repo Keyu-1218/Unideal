@@ -1,3 +1,4 @@
+import "./config.js";
 import express from "express";
 import { NextFunction, Request, Response } from "express";
 import authRoutes from "./routes/auth.js";
@@ -7,12 +8,15 @@ import { errorHandler, httpLogger } from "./middlewares/error-handler.js";
 
 const app = express();
 
-// Enable CORS for all routes
-app.use(cors());
+// Enable CORS for all routes - MUST be before other middleware
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Handles x-www-form-urlencoded
 app.use(httpLogger);
-app.use(errorHandler);  // <--------- using the errorHandler
 
 
 // A route
@@ -26,5 +30,8 @@ app.get('/boom', (_req, _res) => {
 
 app.use("/auth", authRoutes);
 app.use("/products", productsRouter);
+
+// Error handler MUST be last
+app.use(errorHandler);
 
 export default app;
